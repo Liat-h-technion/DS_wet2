@@ -7,8 +7,8 @@ class HashTable {
 private:
     int size;
     int used_size;
-    AVLTree<K, T>[] table;
-}
+    AVLTree<K, T>* table;
+};
 
 #define DS_WET2_HASHTABLE_H
 
