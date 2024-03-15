@@ -115,22 +115,22 @@ K AVLTree<K, T>::getNextKey(const K& key, const K& default_key) const {
 
 template<typename K, typename T>
 K AVLTree<K, T>::getPrevKey(const K &key, const K &default_key) const {
-    Node *next_node = nullptr;
+    Node *prev_node = nullptr;
     Node *curr = root;
     while (curr != nullptr) {
         if (curr->key == key) {
             break;
         } else if (curr->key > key) {
-            next_node = curr;
             curr = curr->left;
         } else {
+            prev_node = curr;
             curr = curr->right;
         }
     }
 
     if (!curr || !curr->left) {
-        if (next_node) {
-            return next_node->key;
+        if (prev_node) {
+            return prev_node->key;
         }
         return default_key;
     }

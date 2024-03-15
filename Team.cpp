@@ -5,6 +5,9 @@ int Team::getSize() {
 }
 
 int Team::get_strength() {
+    if (median_player == Player()) {
+        return 0;
+    }
     return median_player.first;
 }
 
