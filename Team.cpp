@@ -5,6 +5,9 @@ int Team::getSize() {
 }
 
 int Team::get_strength() {
+    if (median_player == Player()) {
+        return 0;
+    }
     return median_player.first;
 }
 
@@ -50,6 +53,10 @@ void Team::remove_newest_player() {
 }
 
 void Team::unite_teams(Team &team2) {
+    if (team2.getSize() == 0) {
+        return;
+    }
+
     // Move all players from team2 to this team's stack (with new ids)
     Stack tmp_stack;
     while (!team2.players_stack.isEmpty()) {
@@ -59,6 +66,14 @@ void Team::unite_teams(Team &team2) {
     }
     while (!tmp_stack.isEmpty()) {
         players_stack.push(tmp_stack.pop());
+    }
+
+    if (this->getSize() == 0) {
+        this->players_tree = team2.players_tree;
+        this->median_player = team2.median_player;
+        team2.players_tree = AVLTree<Player, nullptr_t>();
+        team2.median_player = Player();
+        return;
     }
 
     // Unite the players trees:
