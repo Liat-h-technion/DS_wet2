@@ -26,7 +26,9 @@ private:
     Node* completeTreeInner(int height, Node* node, const K& default_key);
     void deAllocateAllInfoHelper(Node* node);
     int insertInorderToArrayHelper(Node* node, T**& array, int i);
+    int insertKeysInorderToArrayHelper(Node* node, K*& array, int i);
     int insertInorderToTreeHelper(Node *node, T**& array, int i);
+    int insertKeysInorderToTreeHelper(Node *node, K*& array, int i);
 
 public:
     AVLTree() : root(nullptr), size(0) {};
@@ -42,11 +44,15 @@ public:
     T* getMaxKeyInfo() const;
     T* getMinKeyInfo() const;
     T* getRootInfo() const;
-    int getRootKey() const;
+    K getRootKey() const;
+    K getNextKey(const K& key, const K& default_key) const;
+    K getPrevKey(const K& key, const K& default_key) const;
     void deAllocateAllInfo();
     void nearlyCompleteTree(int wantedSize, const K& default_key);
     int insertInorderToArray(T**& array, int i);
+    int insertKeysInorderToArray(K*& array);
     int insertInorderToTree(T**& array, int i);
+    int insertKeysInorderToTree(K*& array);
     void swapTrees(AVLTree<K,T>& tree2);
     void clearTree(Node* node);
 };
@@ -72,13 +78,42 @@ public:
 
 
 template<typename K, typename T>
-int AVLTree<K, T>::getRootKey() const {
+K AVLTree<K, T>::getRootKey() const {
     return root->key;
 }
 
 template<typename K, typename T>
 T *AVLTree<K, T>::getRootInfo() const {
     return root->info;
+}
+
+
+template<typename K, typename T>
+K AVLTree<K, T>::getNextKey(const K& key, const K& default_key) const {
+    Node *next_node = nullptr;
+    Node *curr = root;
+    while (curr != nullptr) {
+        if (curr->key == key) {
+            break;
+        } else if (curr->key > key) {
+            next_node = curr;
+            curr = curr->left;
+        } else {
+            curr = curr->right;
+        }
+    }
+
+    if (!curr || !curr->right) {
+        if (next_node) {
+            return next_node->key;
+        }
+        return default_key;
+        curr = curr->right;
+        while (curr->left) {
+            curr = curr->left;
+        }
+        return curr->key;
+    }
 }
 
 
@@ -586,6 +621,24 @@ int AVLTree<K, T>::insertInorderToArrayHelper(AVLTree::Node *node, T**& array, i
     return i;
 }
 
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToArray(K*& array) {
+    return insertKeysInorderToArrayHelper(root, array, 0);
+}
+
+
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToArrayHelper(AVLTree::Node *node, K*& array, int i) {
+    if (node == nullptr) {
+        return i;
+    }
+    i = insertKeysInorderToArrayHelper(node->left, array, i);
+    array[i] = node->key;
+    i++;
+    i = insertKeysInorderToArrayHelper(node->right, array, i);
+    return i;
+}
+
 
 /* Complexity: time: O(size_a+size_b), space: O(1)
  */
@@ -615,6 +668,32 @@ int mergeSorted(T**& mergedArray, T**& array_a, int size_a, T**& array_b, int si
     return i;
 }
 
+
+template<typename K>
+int mergeSortedKeys(K*& mergedArray, K*& array_a, int size_a, K*& array_b, int size_b) {
+    int ia = 0, ib = 0, i = 0;
+    while ( (ia < size_a) & (ib < size_b)) {
+        if (array_b[ib] > array_a[ia]) {
+            mergedArray[i] = array_a[ia];
+            ia++;
+        }
+        else {
+            mergedArray[i] = array_b[ib];
+            if (array_a[ia] == array_b[ib]) {
+                ia++;
+            }
+            ib++;
+        }
+        i++;
+    }
+    for (; ia < size_a; ia++, i++) {
+        mergedArray[i] = array_a[ia];
+    }
+    for (; ib < size_b; ib++, i++) {
+        mergedArray[i] = array_b[ib];
+    }
+    return i;
+}
 
 /* Complexity: time: O(n), space: O(log n) (where n is the size of array, assuming size of array ~= size of trees)
  */
@@ -677,6 +756,25 @@ int AVLTree<K, T>::insertInorderToTreeHelper(AVLTree::Node *node, T**& array, in
     node->info = array[i];
     i++;
     i = insertInorderToTreeHelper(node->right, array, i);
+    return i;
+}
+
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToTree(K*& array){
+    return insertKeysInorderToTreeHelper(root, array, 0);
+}
+
+
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToTreeHelper(AVLTree::Node *node, K*& array, int i){
+    if (node == nullptr){
+        return i;
+    }
+    i = insertKeysInorderToTreeHelper(node->left, array, i);
+    node->key = array[i];
+    node->info = nullptr;
+    i++;
+    i = insertKeysInorderToTreeHelper(node->right, array, i);
     return i;
 }
 
