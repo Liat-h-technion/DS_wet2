@@ -33,10 +33,10 @@ void Team::update_median_in_erase(Player removed_player) {
         median_player = Player();
     }
     else if (this->getSize() % 2 == 0 && removed_player <= median_player) {
-        median_player = players_tree.getNextKey(median_player);
+        median_player = players_tree.getNextKey(median_player, Player());
     }
     else if (this->getSize() % 2 != 0 && removed_player >= median_player) {
-        median_player = players_tree.getPrevKey(median_player);
+        median_player = players_tree.getPrevKey(median_player, Player());
     }
 }
 
