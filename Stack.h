@@ -11,7 +11,6 @@ public:
     Node(const Pair& data) : data(data), next(nullptr) {}
 };
 
-template<typename T>
 class Stack {
 private:
     Node* top;
@@ -42,12 +41,7 @@ public:
             size--;
             return topData;
         }
-    }
-
-    Pair& getTop() {
-        if (!isEmpty()) {
-            return top->data;
-        }
+        return Pair();
     }
 
     bool isEmpty() const {
@@ -57,7 +51,6 @@ public:
     int getSize() const {
         return size;
     }
-
 };
 
 #endif //DS_WET2_STACK_H
