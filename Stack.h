@@ -33,7 +33,7 @@ public:
         size++;
     }
 
-    T pop() {
+    Pair pop() {
         if (!isEmpty()) {
             Pair topData = top->data;
             Node* temp = top;
@@ -44,8 +44,8 @@ public:
         }
     }
 
-    T& getTop() {
-        if (isEmpty()) {
+    Pair& getTop() {
+        if (!isEmpty()) {
             return top->data;
         }
     }
