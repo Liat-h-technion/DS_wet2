@@ -21,10 +21,10 @@ void Team::update_median_in_insert(Player new_player) {
         median_player = new_player;
     }
     else if (this->getSize() % 2 == 0 && new_player > median_player) {
-        median_player = players_tree.getNextKey(median_player);
+        median_player = players_tree.getNextKey(median_player, Player());
     }
     else if (this->getSize() % 2 != 0 && new_player < median_player) {
-        median_player = players_tree.getPrevKey(median_player);
+        median_player = players_tree.getPrevKey(median_player, Player());
     }
 }
 
