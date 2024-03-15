@@ -1,19 +1,20 @@
 #ifndef DS_WET2_STACK_H
 #define DS_WET2_STACK_H
 
-template<typename T>
+#include "Pair.h"
+
 class Node {
 public:
-    T data;
-    Node<T>* next;
+    Pair data;
+    Node * next;
 
-    Node(const T& data) : data(data), next(nullptr) {}
+    Node(const Pair& data) : data(data), next(nullptr) {}
 };
 
 template<typename T>
 class Stack {
 private:
-    Node<T>* top;
+    Node* top;
     int size;
 
 public:
@@ -25,17 +26,17 @@ public:
         }
     }
 
-    void push(const T& element) {
-        Node<T>* newNode = new Node<T>(element);
+    void push(const Pair& data) {
+        Node* newNode = new Node(data);
         newNode->next = top;
         top = newNode;
         size++;
     }
 
-    T pop() {
+    Pair pop() {
         if (!isEmpty()) {
-            T topData = top->data;
-            Node<T>* temp = top;
+            Pair topData = top->data;
+            Node* temp = top;
             top = top->next;
             delete temp;
             size--;
@@ -43,8 +44,8 @@ public:
         }
     }
 
-    T& getTop() {
-        if (isEmpty()) {
+    Pair& getTop() {
+        if (!isEmpty()) {
             return top->data;
         }
     }
