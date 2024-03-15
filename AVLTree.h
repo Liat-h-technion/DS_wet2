@@ -26,12 +26,9 @@ private:
     Node* completeTreeInner(int height, Node* node, const K& default_key);
     void deAllocateAllInfoHelper(Node* node);
     int insertInorderToArrayHelper(Node* node, T**& array, int i);
+    int insertKeysInorderToArrayHelper(Node* node, K*& array, int i);
     int insertInorderToTreeHelper(Node *node, T**& array, int i);
-    template <typename keyFunction>
-    int insertInorderWithConditionHelper(Node *node, T **&array, int arraySize, int i, int min_id, int max_id,
-                                         keyFunction T::*get_key);
-    template <typename Operation>
-    void doOperationInorderHelper(Node* node, Operation T::*operation, int arg1, int arg2);
+    int insertKeysInorderToTreeHelper(Node *node, K*& array, int i);
 
 public:
     AVLTree() : root(nullptr), size(0) {};
@@ -46,17 +43,18 @@ public:
     int getSize() const;
     T* getMaxKeyInfo() const;
     T* getMinKeyInfo() const;
+    T* getRootInfo() const;
+    K getRootKey() const;
+    K getNextKey(const K& key, const K& default_key) const;
+    K getPrevKey(const K& key, const K& default_key) const;
     void deAllocateAllInfo();
     void nearlyCompleteTree(int wantedSize, const K& default_key);
     int insertInorderToArray(T**& array, int i);
+    int insertKeysInorderToArray(K*& array);
     int insertInorderToTree(T**& array, int i);
+    int insertKeysInorderToTree(K*& array);
     void swapTrees(AVLTree<K,T>& tree2);
     void clearTree(Node* node);
-    template <typename keyFunction>
-    void insertInorderWithCondition(T **&array, int arraySize, int min_id, int max_id, keyFunction T::* get_key);
-
-    template <typename Operation>
-    void doOperationInorder(Operation T::*operation, int arg1, int arg2);
 };
 
 
@@ -72,11 +70,51 @@ public:
     Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0) {};
     bool isLeaf() const;
     void swap(Node* other);
-    Node* next();
+    Node* nextInSubtree();
     void updateHeight();
     int BalanceFactor() const;
     T* getInfo() const;
 };
+
+
+template<typename K, typename T>
+K AVLTree<K, T>::getRootKey() const {
+    return root->key;
+}
+
+template<typename K, typename T>
+T *AVLTree<K, T>::getRootInfo() const {
+    return root->info;
+}
+
+
+template<typename K, typename T>
+K AVLTree<K, T>::getNextKey(const K& key, const K& default_key) const {
+    Node *next_node = nullptr;
+    Node *curr = root;
+    while (curr != nullptr) {
+        if (curr->key == key) {
+            break;
+        } else if (curr->key > key) {
+            next_node = curr;
+            curr = curr->left;
+        } else {
+            curr = curr->right;
+        }
+    }
+
+    if (!curr || !curr->right) {
+        if (next_node) {
+            return next_node->key;
+        }
+        return default_key;
+        curr = curr->right;
+        while (curr->left) {
+            curr = curr->left;
+        }
+        return curr->key;
+    }
+}
 
 
 /* Complexity: time: O(log n), space: O(1)
@@ -369,7 +407,7 @@ void AVLTree<K,T>::eraseInner(const K &key, AVLTree::Node *curr, AVLTree::Node *
 
         // Third case: curr has two sons
         else {
-            Node* nextNode = curr->next();
+            Node* nextNode = curr->nextInSubtree();
             curr->swap(nextNode);
             eraseInner(key, curr->right, curr);
         }
@@ -497,10 +535,10 @@ void AVLTree<K,T>::rotateRight(AVLTree::Node *node, AVLTree::Node *parent) {
 
 
 /* Complexity: time: O(log n), space: O(1)
- * Returns pointer to the next node in-order. If the node is last in the tree, returns nullptr.
+ * Returns pointer to the nextInSubtree node in-order. If the node is last in the tree, returns nullptr.
  */
 template<typename K, typename T>
-typename AVLTree<K,T>::Node *AVLTree<K,T>::Node::next() {
+typename AVLTree<K,T>::Node *AVLTree<K,T>::Node::nextInSubtree() {
     Node* curr = this->right;
     while (curr->left != nullptr) {
         curr = curr->left;
@@ -583,6 +621,24 @@ int AVLTree<K, T>::insertInorderToArrayHelper(AVLTree::Node *node, T**& array, i
     return i;
 }
 
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToArray(K*& array) {
+    return insertKeysInorderToArrayHelper(root, array, 0);
+}
+
+
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToArrayHelper(AVLTree::Node *node, K*& array, int i) {
+    if (node == nullptr) {
+        return i;
+    }
+    i = insertKeysInorderToArrayHelper(node->left, array, i);
+    array[i] = node->key;
+    i++;
+    i = insertKeysInorderToArrayHelper(node->right, array, i);
+    return i;
+}
+
 
 /* Complexity: time: O(size_a+size_b), space: O(1)
  */
@@ -612,6 +668,32 @@ int mergeSorted(T**& mergedArray, T**& array_a, int size_a, T**& array_b, int si
     return i;
 }
 
+
+template<typename K>
+int mergeSortedKeys(K*& mergedArray, K*& array_a, int size_a, K*& array_b, int size_b) {
+    int ia = 0, ib = 0, i = 0;
+    while ( (ia < size_a) & (ib < size_b)) {
+        if (array_b[ib] > array_a[ia]) {
+            mergedArray[i] = array_a[ia];
+            ia++;
+        }
+        else {
+            mergedArray[i] = array_b[ib];
+            if (array_a[ia] == array_b[ib]) {
+                ia++;
+            }
+            ib++;
+        }
+        i++;
+    }
+    for (; ia < size_a; ia++, i++) {
+        mergedArray[i] = array_a[ia];
+    }
+    for (; ib < size_b; ib++, i++) {
+        mergedArray[i] = array_b[ib];
+    }
+    return i;
+}
 
 /* Complexity: time: O(n), space: O(log n) (where n is the size of array, assuming size of array ~= size of trees)
  */
@@ -677,6 +759,25 @@ int AVLTree<K, T>::insertInorderToTreeHelper(AVLTree::Node *node, T**& array, in
     return i;
 }
 
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToTree(K*& array){
+    return insertKeysInorderToTreeHelper(root, array, 0);
+}
+
+
+template<typename K, typename T>
+int AVLTree<K, T>::insertKeysInorderToTreeHelper(AVLTree::Node *node, K*& array, int i){
+    if (node == nullptr){
+        return i;
+    }
+    i = insertKeysInorderToTreeHelper(node->left, array, i);
+    node->key = array[i];
+    node->info = nullptr;
+    i++;
+    i = insertKeysInorderToTreeHelper(node->right, array, i);
+    return i;
+}
+
 
 /* Complexity: time: O(n), space: O(log n)
  */
@@ -686,50 +787,6 @@ void fill3TreesFromArray(AVLTree<K,T>* newTrees, T**& array){
     for(int i = 0; i < 3; i++){
         last_position = newTrees[i].insertInorderToTree(array, last_position);
     }
-}
-
-
-/* Complexity: time: O(n), space: O(log n)
- */
-template<typename K, typename T, typename keyFunction>
-void fill3TreesWithCondition(AVLTree<K,T>* newTrees, T**& array, int arraySize, int (&min_ids)[3], int (&max_ids)[3],
-                             keyFunction T::* get_key){
-    for(int i = 0; i < 3; i++){
-        newTrees[i].insertInorderWithCondition(array, arraySize, min_ids[i], max_ids[i], get_key);
-    }
-}
-
-
-/* Complexity: time: O(n), space: O(log n)
- */
-template<typename K, typename T>
-template <typename keyFunction>
-void AVLTree<K, T>::insertInorderWithCondition(T**& array, int arraySize, int min_id, int max_id, keyFunction T::* get_key){
-    insertInorderWithConditionHelper(root, array, arraySize, 0, min_id, max_id, get_key);
-}
-
-
-/* Complexity: time: O(treeSize+ArraySize), space: O(log(treeSize)+log(ArraySize)) assuming the complexity of getId() and get_key is O(1).
- */
-template<typename K, typename T>
-template <typename keyFunction>
-int AVLTree<K, T>::insertInorderWithConditionHelper(AVLTree::Node *node, T**& array, int arraySize, int i, int min_id,
-                                                    int max_id, keyFunction T::* get_key){
-    if (node == nullptr){
-        return i;
-    }
-    i = insertInorderWithConditionHelper(node->left, array, arraySize, i, min_id, max_id, get_key);
-    while (i < arraySize) {
-        if ( (array[i]->getId() > min_id) & (array[i]->getId() <= max_id) ) {
-            node->key = (array[i]->*get_key)();
-            node->info = array[i];
-            i++;
-            break;
-        }
-        i++;
-    }
-    i = insertInorderWithConditionHelper(node->right, array, arraySize, i, min_id, max_id, get_key);
-    return i;
 }
 
 
@@ -810,29 +867,6 @@ void AVLTree<K, T>::swapTrees(AVLTree<K, T> &tree2) {
     int tempSize = this->size;
     this->size = tree2.size;
     tree2.size = tempSize;
-}
-
-
-/* Complexity: time: O(n), space: O(log n) (assuming the operation complexity is O(1))
- */
-template<typename K, typename T>
-template<typename Operation>
-void AVLTree<K, T>::doOperationInorder(Operation T::*operation, int arg1, int arg2) {
-    doOperationInorderHelper(root, operation, arg1, arg2);
-}
-
-
-/* Complexity: time: O(n), space: O(log n) (assuming the operation complexity is O(1))
- */
-template<typename K, typename T>
-template<typename Operation>
-void AVLTree<K, T>::doOperationInorderHelper(AVLTree::Node *node, Operation T::*operation, int arg1, int arg2) {
-    if (node == nullptr) {
-        return;
-    }
-    doOperationInorderHelper(node->left, operation, arg1, arg2);
-    (node->info->*operation)(arg1, arg2);
-    doOperationInorderHelper(node->right, operation, arg1, arg2);
 }
 
 
