@@ -1,64 +1,62 @@
 #ifndef DS_WET2_STACK_H
 #define DS_WET2_STACK_H
 
+template<typename T>
+class Node {
+public:
+    T data;
+    Node<T>* next;
+
+    Node(const T& data) : data(data), next(nullptr) {}
+};
 
 template<typename T>
 class Stack {
 private:
-    T* data;
-    int capacity;
-    int top;
+    Node<T>* top;
+    int size;
 
 public:
-    Stack(int capacity = 10) : capacity(capacity), top(0) {
-        data = new T[capacity];
-    }
+    Stack() : top(nullptr), size(0) {}
 
     ~Stack() {
-        delete[] data;
+        while (!isEmpty()) {
+            pop();
+        }
     }
 
     void push(const T& element) {
-        if (top == capacity) {
-            resize(capacity * 2);
-        }
-        data[top++] = element;
+        Node<T>* newNode = new Node<T>(element);
+        newNode->next = top;
+        top = newNode;
+        size++;
     }
 
     T pop() {
         if (!isEmpty()) {
-            return data[--top];
+            T topData = top->data;
+            Node<T>* temp = top;
+            top = top->next;
+            delete temp;
+            size--;
+            return topData;
         }
     }
 
     T& getTop() {
-        if (!isEmpty()) {
-            return data[top - 1];
+        if (isEmpty()) {
+            return top->data;
         }
     }
 
     bool isEmpty() const {
-        return top == 0;
+        return top == nullptr;
     }
 
-    int size() const {
-        return top;
+    int getSize() const {
+        return size;
     }
 
-private:
-    void resize(int newCapacity) {
-        T* newData = new T[newCapacity];
-        for (int i = 0; i < top; i++) {
-            newData[i] = data[i];
-        }
-        delete[] data;
-        data = newData;
-        capacity = newCapacity;
-    }
 };
-
-
-
-
 
 #endif //DS_WET2_STACK_H
