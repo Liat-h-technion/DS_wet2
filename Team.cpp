@@ -81,7 +81,12 @@ void Team::unite_teams(Team &team2) {
     new_tree.insertKeysInorderToArray(merged_array);
     this->players_tree = new_tree;
 
-    // Update the median
+    // Update the median: Find the new median in the merged array according to the size
+    int median_idx = actual_size / 2;
+    if (actual_size % 2 == 0) {
+        median_idx += 1;
+    }
+    this->median_player = merged_array[median_idx];
 
     // de-allocate temp arrays
     delete[] array1;
