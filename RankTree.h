@@ -70,7 +70,7 @@ public:
     int extra;
     int subtree_size;
 
-    explicit Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
+    Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
                                           extra(0), subtree_size(1) {};
     Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0), extra(0), subtree_size(1) {};
     bool isLeaf() const;
