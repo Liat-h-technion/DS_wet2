@@ -58,15 +58,51 @@ public:
     int extra;
     int subtree_size;
 
-    explicit Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0) {};
-    Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0) {};
+    explicit Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
+                                          extra(0), subtree_size(1) {};
+    Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0), extra(0), subtree_size(1) {};
     bool isLeaf() const;
     void swap(Node* other);
     Node* nextInSubtree();
     void updateHeight();
+    void updateSubtreeSize();
     int BalanceFactor() const;
     T* getInfo() const;
 };
+
+
+template<typename K, typename T>
+int RankTree<K, T>::get_num_wins(const K &key) {
+    if (!find(key)) {
+        return 0;
+    }
+
+    Node* curr = root;
+    int wins = 0;
+    while (curr != nullptr) {
+        wins += curr->extra;
+        if (curr->key == key) {
+            return wins;
+        }
+        else if (curr->key > key) {
+            curr = curr->left;
+        }
+        else {
+            curr = curr->right;
+        }
+    }
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::Node::updateSubtreeSize() {
+    subtree_size = 1;
+    if (right) {
+        subtree_size += right->subtree_size;
+    }
+    if (left) {
+        subtree_size += left->subtree_size;
+    }
+}
 
 
 /* Complexity: time: O(log n), space: O(1)
@@ -278,6 +314,7 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
         }
     }
     curr->updateHeight();
+    curr->updateSubtreeSize();
     reBalanceSubTree(curr, parent);
 }
 
@@ -323,6 +360,14 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
 
         // Second case: curr has one son
         else if (curr->left == nullptr || curr->right == nullptr) {
+            // Update the "extra" in curr's son
+            if (curr->left) {
+                curr->left->extra += curr->extra;
+            }
+            else {
+                curr->right->extra += curr->extra;
+            }
+
             // disconnect the node from its parent:
             if (parent != nullptr) {
                 if (parent->left->key == curr->key) {
@@ -360,7 +405,21 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
         // Third case: curr has two sons
         else {
             Node* nextNode = curr->nextInSubtree();
+            // Swap the node with the next node in the subtree.
+            // Update the extra to be the correct amount of wins for the next node
+            int wins = get_num_wins(nextNode->key);
+            int removed_node_wins = get_num_wins(curr->key);
             curr->swap(nextNode);
+            int diff = wins - removed_node_wins;
+            curr->extra += diff;
+            // Subtract the diff in "extra" in curr node from the sons
+            if (curr->right) {
+                curr->right->extra -= diff;
+            }
+            if (curr->left) {
+                curr->left->extra -= diff;
+            }
+
             eraseInner(key, curr->right, curr);
         }
     }
@@ -373,6 +432,7 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
         eraseInner(key, curr->right, curr);
     }
     curr->updateHeight();
+    curr->updateSubtreeSize();
     reBalanceSubTree(curr, parent);
 }
 
@@ -460,6 +520,14 @@ void RankTree<K,T>::rotateLeft(RankTree::Node *node, RankTree::Node *parent) {
     }
     node->updateHeight();
     tmpParent->updateHeight();
+
+    // Update subtree size:
+    node->updateSubtreeSize();
+    tmpParent->updateSubtreeSize();
+    // Update the "extra":
+    tmpParent->extra += node->extra;
+    node->extra -= tmpParent->extra;
+    tmpSon->extra -= node->extra;
 }
 
 
@@ -483,6 +551,14 @@ void RankTree<K,T>::rotateRight(RankTree::Node *node, RankTree::Node *parent) {
     }
     node->updateHeight();
     tmpParent->updateHeight();
+
+    // Update subtree size:
+    node->updateSubtreeSize();
+    tmpParent->updateSubtreeSize();
+    // Update the "extra":
+    tmpParent->extra += node->extra;
+    node->extra -= tmpParent->extra;
+    tmpSon->extra -= node->extra;
 }
 
 
