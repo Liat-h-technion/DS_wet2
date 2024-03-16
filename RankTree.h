@@ -46,17 +46,11 @@ public:
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
     K get_key_from_index(int idx);
+
+    // TODO: delete after done testing
+    void print_inorder_indexes();
+    void print_inorder_indexes_helper(Node* node);
 };
-
-
-template<typename K, typename T>
-void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
-    add_wins(max_key, x);
-    K prev = getPrevKey(min_key);
-    if (prev != default_key) {
-        add_wins(prev, -x);
-    }
-}
 
 
 template<typename K, typename T>
@@ -569,7 +563,9 @@ void RankTree<K,T>::rotateLeft(RankTree::Node *node, RankTree::Node *parent) {
     // Update the "extra":
     tmpParent->extra += node->extra;
     node->extra -= tmpParent->extra;
-    tmpSon->extra -= node->extra;
+    if (tmpSon) {
+        tmpSon->extra -= node->extra;
+    }
 }
 
 
@@ -600,7 +596,9 @@ void RankTree<K,T>::rotateRight(RankTree::Node *node, RankTree::Node *parent) {
     // Update the "extra":
     tmpParent->extra += node->extra;
     node->extra -= tmpParent->extra;
-    tmpSon->extra -= node->extra;
+    if (tmpSon) {
+        tmpSon->extra -= node->extra;
+    }
 }
 
 
@@ -689,10 +687,10 @@ int RankTree<K, T>::get_index_from_key_helper(const K& key, Node* node) {
         left_subTree_size = node->left->subtree_size;
     }
     if(node->key > key) {
-        return get_index_from_key_helper(node->left);
+        return get_index_from_key_helper(key, node->left);
     }
     else if(node->key < key){
-        return left_subTree_size + 1 + get_index_from_key_helper(node->right);
+        return left_subTree_size + 1 + get_index_from_key_helper(key, node->right);
     }
     else{ // (key == node->key)
         return left_subTree_size + 1;
@@ -706,23 +704,24 @@ K RankTree<K, T>::get_key_from_index(int idx){
     }
     Node * node = root;
     int counter = 0;
-    while(counter != idx){
+    while(counter != idx && node != nullptr){
         int left_subTree_size = 0;
         if(node->left){
             left_subTree_size = node->left->subtree_size;
         }
         counter += left_subTree_size + 1;
-        if(counter == idx){
-            return node->key;
-        }
         if(counter > idx) {
             counter -= left_subTree_size + 1;
             node = node->left;
         }
-        if(counter < idx){
+        else if(counter < idx){
             node = node->right;
         }
+        else { // counter == idx
+            return node->key;
+        }
     }
+    return default_key;
 }
 
 template<typename K, typename T>
@@ -758,5 +757,36 @@ void RankTree<K, T>::add_wins(const K& key, int x){
     }
 }
 
+
+template<typename K, typename T>
+void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
+    add_wins(max_key, x);
+    K prev = getPrevKey(min_key);
+    if (prev != default_key) {
+        add_wins(prev, -x);
+    }
+}
+
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_indexes() {
+    print_inorder_indexes_helper(root);
+    std::cout << std::endl;
+}
+
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_indexes_helper(Node* node) {
+    if (!node) {
+        return;
+    }
+    print_inorder_indexes_helper(node->left);
+    int idx = get_index_from_key(node->key);
+    std::cout << idx << " ";
+    if ( !(node->key == get_key_from_index(idx)) ) {
+        std::cout << "Problem in node ";
+    }
+    print_inorder_indexes_helper(node->right);
+}
 
 #endif //DS_WET1_RankTree_H
