@@ -23,6 +23,7 @@ private:
     void rotateRight(Node* node, Node* parent);
     void reBalanceSubTree(Node* node, Node* parent);
     void deAllocateAllInfoHelper(Node* node);
+    int get_index_from_key_helper(const K& key, Node* node);
 
 public:
     RankTree() : root(nullptr), size(0) {};
@@ -43,7 +44,7 @@ public:
     void add_wins(const K& key, int x);
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
-    int get_key_from_index(int idx);
+    K get_key_from_index(int idx, const K& default_key);
 };
 
 
@@ -632,5 +633,60 @@ void RankTree<K, T>::deAllocateAllInfoHelper(RankTree::Node* node) {
     delete info;
 }
 
+template<typename K, typename T>
+int RankTree<K, T>::get_index_from_key(const K& key){
+    if(find(key) == nullptr){
+        return -1;
+    }
+    return get_index_from_key_helper(key, root);
+}
+
+template<typename K, typename T>
+int RankTree<K, T>::get_index_from_key_helper(const K& key, Node* node) {
+    int left_subTree_size = 0;
+    if(node->left){
+        left_subTree_size = node->left->subtree_size;
+    }
+    if(node->key > key) {
+        return get_index_from_key_helper(node->left);
+    }
+    else if(node->key < key){
+        return left_subTree_size + 1 + get_index_from_key_helper(node->right);
+    }
+    else{ // (key == node->key)
+        return left_subTree_size + 1;
+    }
+}
+
+template<typename K, typename T>
+K RankTree<K, T>::get_key_from_index(int idx,  const K& default_key){
+    if(idx <= 0 || idx > size){
+        return default_key;
+    }
+    Node * node = root;
+    int counter = 0;
+    while(counter != idx){
+        int left_subTree_size = 0;
+        if(node->left){
+            left_subTree_size = node->left->subtree_size;
+        }
+        counter += left_subTree_size + 1;
+        if(counter == idx){
+            return node->key;
+        }
+        if(counter > idx) {
+            counter -= left_subTree_size + 1;
+            node = node->left;
+        }
+        if(counter < idx){
+            node = node->right;
+        }
+    }
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::add_wins(const K& key, int x){
+
+}
 
 #endif //DS_WET1_RankTree_H
