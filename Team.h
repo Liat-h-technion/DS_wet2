@@ -9,6 +9,7 @@ typedef Pair Player;
 
 class Team {
 private:
+    int team_id;
     Stack players_stack;
     AVLTree<Player,nullptr_t> players_tree;
     Player median_player;
@@ -17,10 +18,11 @@ private:
     void update_median_in_erase(Player new_player);
 
 public:
-    Team() = default;
+    explicit Team(int team_id) : team_id(team_id) {};
     ~Team() = default;
-    int getSize();
-    int get_strength();
+    int getSize() const;
+    int getId() const;
+    int get_strength() const;
     void add_player(int strength);
     void remove_newest_player();
     void unite_teams(Team& other_team);
