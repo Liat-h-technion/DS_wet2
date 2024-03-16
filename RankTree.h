@@ -26,7 +26,7 @@ private:
     void deAllocateAllInfoHelper(Node* node);
     int get_index_from_key_helper(const K& key, Node* node);
 public:
-    explicit RankTree() : root(nullptr), size(0), default_key(K()) {};
+    RankTree() : root(nullptr), size(0), default_key(K()) {};
     ~RankTree();
     bool isEmpty() const;
     bool contains(const K& key) const;
@@ -70,7 +70,7 @@ public:
     int extra;
     int subtree_size;
 
-    Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
+    explicit Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
                                           extra(0), subtree_size(1) {};
     Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0), extra(0), subtree_size(1) {};
     bool isLeaf() const;
