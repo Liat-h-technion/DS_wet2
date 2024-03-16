@@ -1,10 +1,10 @@
 #include "Team.h"
 
-int Team::getSize() {
+int Team::getSize() const {
     return players_tree.getSize();
 }
 
-int Team::get_strength() {
+int Team::get_strength() const {
     if (median_player == Player()) {
         return 0;
     }
@@ -107,4 +107,8 @@ void Team::unite_teams(Team &team2) {
     delete[] array1;
     delete[] array2;
     delete[] merged_array;
+}
+
+int Team::getId() const {
+    return team_id;
 }
