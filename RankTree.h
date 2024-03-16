@@ -711,7 +711,11 @@ void RankTree<K, T>::add_wins(const K& key, int x){
         if(!right_streak) {
             node->extra += x;
         }
+        if(node->right){
+            node->right->extra -= x;
+        }
     }
 }
+
 
 #endif //DS_WET1_RankTree_H
