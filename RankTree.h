@@ -26,7 +26,7 @@ private:
     void deAllocateAllInfoHelper(Node* node);
     int get_index_from_key_helper(const K& key, Node* node);
 public:
-    RankTree() : root(nullptr), size(0), default_key(default_key) {};
+    explicit RankTree() : root(nullptr), size(0), default_key(K()) {};
     ~RankTree();
     bool isEmpty() const;
     bool contains(const K& key) const;
