@@ -704,7 +704,7 @@ K RankTree<K, T>::get_key_from_index(int idx){
     }
     Node * node = root;
     int counter = 0;
-    while(counter != idx){
+    while(counter != idx && node != nullptr){
         int left_subTree_size = 0;
         if(node->left){
             left_subTree_size = node->left->subtree_size;
