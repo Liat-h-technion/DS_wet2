@@ -13,6 +13,7 @@ private:
     class Node;
     Node* root;
     int size;
+    K default_key;
     void insertInner(const K& key, T* info, Node* curr, Node* parent);
     void eraseInner(const K& key, Node* curr, Node* parent);
     void leftLeftFix(Node* node, Node* parent);
@@ -24,9 +25,8 @@ private:
     void reBalanceSubTree(Node* node, Node* parent);
     void deAllocateAllInfoHelper(Node* node);
     int get_index_from_key_helper(const K& key, Node* node);
-
 public:
-    RankTree() : root(nullptr), size(0) {};
+    RankTree() : root(nullptr), size(0), default_key(default_key) {};
     ~RankTree();
     bool isEmpty() const;
     bool contains(const K& key) const;
@@ -40,12 +40,23 @@ public:
     T* getMinKeyInfo() const;
     void deAllocateAllInfo();
     void clearTree(Node* node);
+    K getPrevKey(const K& key) const;
     int get_num_wins(const K& key);
     void add_wins(const K& key, int x);
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
-    K get_key_from_index(int idx, const K& default_key);
+    K get_key_from_index(int idx);
 };
+
+
+template<typename K, typename T>
+void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
+    add_wins(max_key, x);
+    K prev = getPrevKey(min_key);
+    if (prev != default_key) {
+        add_wins(prev, -x);
+    }
+}
 
 
 template<typename K, typename T>
@@ -103,6 +114,36 @@ void RankTree<K, T>::Node::updateSubtreeSize() {
     if (left) {
         subtree_size += left->subtree_size;
     }
+}
+
+
+
+template<typename K, typename T>
+K RankTree<K, T>::getPrevKey(const K &key) const {
+    Node *prev_node = nullptr;
+    Node *curr = root;
+    while (curr != nullptr) {
+        if (curr->key == key) {
+            break;
+        } else if (curr->key > key) {
+            curr = curr->left;
+        } else {
+            prev_node = curr;
+            curr = curr->right;
+        }
+    }
+
+    if (!curr || !curr->left) {
+        if (prev_node) {
+            return prev_node->key;
+        }
+        return default_key;
+    }
+    curr = curr->left;
+    while (curr->right) {
+        curr = curr->right;
+    }
+    return curr->key;
 }
 
 
@@ -659,7 +700,7 @@ int RankTree<K, T>::get_index_from_key_helper(const K& key, Node* node) {
 }
 
 template<typename K, typename T>
-K RankTree<K, T>::get_key_from_index(int idx,  const K& default_key){
+K RankTree<K, T>::get_key_from_index(int idx){
     if(idx <= 0 || idx > size){
         return default_key;
     }
