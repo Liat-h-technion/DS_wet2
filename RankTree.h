@@ -727,7 +727,36 @@ K RankTree<K, T>::get_key_from_index(int idx){
 
 template<typename K, typename T>
 void RankTree<K, T>::add_wins(const K& key, int x){
-
+    if(find(key) == nullptr){
+        return;
+    }
+    Node * node = root;
+    bool right_streak = false;
+    while(node->key != key){
+        if(node->key > key) {
+            if(right_streak){
+                node->extra -= x;
+            }
+            right_streak = false;
+            node = node->left;
+        }
+        if(node->key < key){
+            if(!right_streak){
+                node->extra += x;
+            }
+            right_streak = true;
+            node = node->right;
+        }
+    }
+    if(node->key == key){
+        if(!right_streak) {
+            node->extra += x;
+        }
+        if(node->right){
+            node->right->extra -= x;
+        }
+    }
 }
+
 
 #endif //DS_WET1_RankTree_H
