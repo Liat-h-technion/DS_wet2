@@ -9,10 +9,10 @@ public:
     Pair(int first, int second) : first(first), second(second) {};
     Pair():first(DEFAULT), second(DEFAULT){};
     bool operator>(const Pair& other) const{
-        return (first > other.first || (first == other.first && second > other.second));
+        return (first > other.first || (first == other.first && second < other.second));
     }
     bool operator<(const Pair& other) const{
-        return (first < other.first || (first == other.first && second < other.second));
+        return (first < other.first || (first == other.first && second > other.second));
     }
     bool operator==(const Pair& other) const{
         return(first == other.first && second == other.second);
