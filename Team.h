@@ -10,7 +10,7 @@ typedef Pair Player;
 class Team {
 private:
     Stack players_stack;
-    AVLTree<Player,nullptr_t> players_tree;
+    AVLTree<Player,std::nullptr_t> players_tree;
     Player median_player;
 
     void update_median_in_insert(Player new_player);
