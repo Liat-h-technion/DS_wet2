@@ -50,6 +50,8 @@ public:
     // TODO: delete after done testing
     void print_inorder_indexes();
     void print_inorder_indexes_helper(Node* node);
+    void print_inorder();
+    void print_inorder_helper(Node* node);
 };
 
 
@@ -760,6 +762,9 @@ void RankTree<K, T>::add_wins(const K& key, int x){
 
 template<typename K, typename T>
 void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
+    if (min_key > max_key) {
+        return;
+    }
     add_wins(max_key, x);
     K prev = getPrevKey(min_key);
     if (prev != default_key) {
@@ -788,5 +793,21 @@ void RankTree<K, T>::print_inorder_indexes_helper(Node* node) {
     }
     print_inorder_indexes_helper(node->right);
 }
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder() {
+    print_inorder_helper(root);
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_helper(Node* node) {
+    if (!node) {
+        return;
+    }
+    print_inorder_helper(node->left);
+    std::cout << "id: " << node->key.second << " strength:  " << node->key.first << std::endl;
+    print_inorder_helper(node->right);
+}
+
 
 #endif //DS_WET1_RankTree_H
