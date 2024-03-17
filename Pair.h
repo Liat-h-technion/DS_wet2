@@ -30,6 +30,9 @@ public:
     bool operator>=(const Pair& other) const{
         return (*this > other || *this == other);
     }
+    bool operator!=(const Pair& other) const{
+        return (!(*this == other));
+    }
 };
 
 
