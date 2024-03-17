@@ -65,10 +65,11 @@ public:
     int height;
     int extra;
     int subtree_size;
-
+    int max_rank;
     explicit Node(const K& default_key) : key(default_key), info(nullptr), left(nullptr), right(nullptr), height(0),
-                                          extra(0), subtree_size(1) {};
-    Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0), extra(0), subtree_size(1) {};
+                                          extra(0), subtree_size(1), max_rank(0) {};
+    Node(const K& key, T* info) : key(key), info(info), left(nullptr), right(nullptr), height(0), extra(0),
+                                  subtree_size(1), max_rank(info->get_strength()) {};
     bool isLeaf() const;
     void swap(Node* other);
     Node* nextInSubtree();
@@ -334,6 +335,10 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
             // Add leaf as left son
             Node* newNode = new Node(key, info);
             curr->left = newNode;
+            // Update "extra" in the new node:
+            int sum_extra = get_num_wins(curr->key); // sum of extra values in path to the new node
+            newNode->extra -= sum_extra;
+
         }
         else {
             // Continue down to left subtree
@@ -345,6 +350,9 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
             // Add leaf as right son
             Node* newNode = new Node(key, info);
             curr->right = newNode;
+            // Update "extra" in the new node:
+            int sum_extra = get_num_wins(curr->key); // sum of extra values in path to the new node
+            newNode->extra -= sum_extra;
         }
         else {
             // Continue down to right subtree
