@@ -16,12 +16,14 @@
 #define OLYMPICSA2_H_
 
 #include "wet2util.h"
+#include "HashTable.h"
+#include "Team.h"
+#include "RankTree.h"
 
 class olympics_t {
 private:
-	//
-	// Here you may add anything you want
-	//
+	HashTable<Team> teams_hash;
+    RankTree<Pair, Team> teams_rank_tree;
 	
 public:
 	// <DO-NOT-MODIFY> {
