@@ -116,3 +116,10 @@ int Team::getId() const {
 Pair Team::get_pair_key() const {
     return Pair(get_strength(), team_id);
 }
+
+bool Team::isEmpty() const {
+    if(this->getSize() == 0){
+        return true;
+    }
+    return false;
+}

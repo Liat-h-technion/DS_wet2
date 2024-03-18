@@ -63,8 +63,32 @@ StatusType olympics_t::remove_newest_player(int teamId)
 
 output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 {
-    // TODO: Your code goes here
-    return 2008;
+    if(teamId1<=0 || teamId2<=0 || teamId1 == teamId2){
+        return StatusType::INVALID_INPUT;
+    }
+    Team* team1 = teams_hash.find(teamId1);
+    Team* team2 = teams_hash.find(teamId2);
+    if(!team1 || !team2 || team1->isEmpty() || team2->isEmpty()){
+        return StatusType::FAILURE;
+    }
+    int first_score = 0, second_score = 0;
+    first_score = team1->get_strength();
+    second_score = team2->get_strength();
+    if(first_score > second_score){
+        teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
+    }
+    if(first_score < second_score){
+        teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
+    }
+    if(first_score == second_score){
+        if(teamId1 > teamId2){
+            teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
+        }
+        else{
+            teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
+        }
+    }
+    return StatusType::SUCCESS;
 }
 
 output_t<int> olympics_t::num_wins_for_team(int teamId)
