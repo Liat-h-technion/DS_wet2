@@ -24,6 +24,7 @@ private:
     void rotateRight(Node* node, Node* parent);
     void reBalanceSubTree(Node* node, Node* parent);
     void deAllocateAllInfoHelper(Node* node);
+    void add_wins_helper(const K& key, int x, Node* node, bool right_streak);
     int get_index_from_key_helper(const K& key, Node* node);
 public:
     RankTree() : root(nullptr), size(0), default_key(K()) {};
@@ -46,12 +47,14 @@ public:
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
     K get_key_from_index(int idx);
-
+    int get_max_rank() const;
     // TODO: delete after done testing
     void print_inorder_indexes();
     void print_inorder_indexes_helper(Node* node);
     void print_inorder();
     void print_inorder_helper(Node* node);
+    void print_inorder_wins();
+    void print_inorder_wins_helper(Node* node);
 };
 
 
@@ -75,6 +78,7 @@ public:
     Node* nextInSubtree();
     void updateHeight();
     void updateSubtreeSize();
+    void updateMaxRank();
     int BalanceFactor() const;
     T* getInfo() const;
 };
@@ -102,6 +106,12 @@ int RankTree<K, T>::get_num_wins(const K &key) {
     }
 }
 
+
+template<typename K, typename T>
+int RankTree<K, T>::get_max_rank() const {
+    return root->max_rank;
+}
+
 template<typename K, typename T>
 void RankTree<K, T>::Node::updateSubtreeSize() {
     subtree_size = 1;
@@ -113,6 +123,17 @@ void RankTree<K, T>::Node::updateSubtreeSize() {
     }
 }
 
+
+template<typename K, typename T>
+void RankTree<K, T>::Node::updateMaxRank() {
+    this->max_rank = this->info->get_strength() + this->extra;
+    if (right && this->max_rank < right->max_rank + this->extra) {
+        this->max_rank = right->max_rank + this->extra;
+    }
+    if (left && this->max_rank < left->max_rank + this->extra) {
+        this->max_rank = left->max_rank + this->extra;
+    }
+}
 
 
 template<typename K, typename T>
@@ -335,9 +356,10 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
             // Add leaf as left son
             Node* newNode = new Node(key, info);
             curr->left = newNode;
-            // Update "extra" in the new node:
+            // Update "extra" and "max_rank" in the new node:
             int sum_extra = get_num_wins(curr->key); // sum of extra values in path to the new node
             newNode->extra -= sum_extra;
+            newNode->max_rank += newNode->extra;
 
         }
         else {
@@ -350,9 +372,10 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
             // Add leaf as right son
             Node* newNode = new Node(key, info);
             curr->right = newNode;
-            // Update "extra" in the new node:
+            // Update "extra" and "max_rank" in the new node:
             int sum_extra = get_num_wins(curr->key); // sum of extra values in path to the new node
             newNode->extra -= sum_extra;
+            newNode->max_rank += newNode->extra;
         }
         else {
             // Continue down to right subtree
@@ -361,6 +384,7 @@ void RankTree<K,T>::insertInner(const K& key, T* info, RankTree::Node *curr, Ran
     }
     curr->updateHeight();
     curr->updateSubtreeSize();
+    curr->updateMaxRank();
     reBalanceSubTree(curr, parent);
 }
 
@@ -409,9 +433,11 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
             // Update the "extra" in curr's son
             if (curr->left) {
                 curr->left->extra += curr->extra;
+                curr->left->updateMaxRank();
             }
             else {
                 curr->right->extra += curr->extra;
+                curr->right->updateMaxRank();
             }
 
             // disconnect the node from its parent:
@@ -461,11 +487,13 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
             // Subtract the diff in "extra" in curr node from the sons
             if (curr->right) {
                 curr->right->extra -= diff;
+                curr->right->updateMaxRank();
             }
             if (curr->left) {
                 curr->left->extra -= diff;
+                curr->left->updateMaxRank();
             }
-
+            curr->updateMaxRank();
             eraseInner(key, curr->right, curr);
         }
     }
@@ -479,6 +507,7 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
     }
     curr->updateHeight();
     curr->updateSubtreeSize();
+    curr->updateMaxRank();
     reBalanceSubTree(curr, parent);
 }
 
@@ -575,7 +604,11 @@ void RankTree<K,T>::rotateLeft(RankTree::Node *node, RankTree::Node *parent) {
     node->extra -= tmpParent->extra;
     if (tmpSon) {
         tmpSon->extra -= node->extra;
+        tmpSon->updateMaxRank();
     }
+    // Update max_rank:
+    node->updateMaxRank();
+    tmpParent->updateMaxRank();
 }
 
 
@@ -608,7 +641,11 @@ void RankTree<K,T>::rotateRight(RankTree::Node *node, RankTree::Node *parent) {
     node->extra -= tmpParent->extra;
     if (tmpSon) {
         tmpSon->extra -= node->extra;
+        tmpSon->updateMaxRank();
     }
+    // Update max_rank:
+    node->updateMaxRank();
+    tmpParent->updateMaxRank();
 }
 
 
@@ -739,32 +776,39 @@ void RankTree<K, T>::add_wins(const K& key, int x){
     if(find(key) == nullptr){
         return;
     }
-    Node * node = root;
-    bool right_streak = false;
-    while(node->key != key){
-        if(node->key > key) {
-            if(right_streak){
-                node->extra -= x;
-            }
-            right_streak = false;
-            node = node->left;
-        }
-        if(node->key < key){
-            if(!right_streak){
-                node->extra += x;
-            }
-            right_streak = true;
-            node = node->right;
-        }
-    }
+    add_wins_helper(key, x, root, false);
+}
+
+
+template<typename K, typename T>
+void RankTree<K, T>::add_wins_helper(const K& key, int x, Node* node, bool right_streak){
     if(node->key == key){
         if(!right_streak) {
             node->extra += x;
         }
         if(node->right){
             node->right->extra -= x;
+            node->right->updateMaxRank();
         }
+        if (node->left) {
+            node->left->updateMaxRank();
+        }
+        node->updateMaxRank();
+        return;
     }
+    if(node->key > key) {
+        if(right_streak){
+            node->extra -= x;
+        }
+        add_wins_helper(key, x, node->left, false);
+    }
+    if(node->key < key){
+        if(!right_streak){
+            node->extra += x;
+        }
+        add_wins_helper(key, x, node->right, true);
+    }
+    node->updateMaxRank();
 }
 
 
@@ -796,7 +840,7 @@ void RankTree<K, T>::print_inorder_indexes_helper(Node* node) {
     print_inorder_indexes_helper(node->left);
     int idx = get_index_from_key(node->key);
     std::cout << idx << " ";
-    if ( !(node->key == get_key_from_index(idx)) ) {
+    if (node->key != get_key_from_index(idx)) {
         std::cout << "Problem in node ";
     }
     print_inorder_indexes_helper(node->right);
@@ -813,8 +857,24 @@ void RankTree<K, T>::print_inorder_helper(Node* node) {
         return;
     }
     print_inorder_helper(node->left);
-    std::cout << "id: " << node->key.second << " strength:  " << node->key.first << std::endl;
+    std::cout << "strength: " << node->key.first << " team_id:  " << node->key.second << std::endl;
     print_inorder_helper(node->right);
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_wins() {
+    print_inorder_wins_helper(root);
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_wins_helper(Node* node) {
+    if (!node) {
+        return;
+    }
+    print_inorder_wins_helper(node->left);
+    std::cout << "strength: " << node->key.first << " team_id: " << node->key.second
+        << " wins: " << get_num_wins(node->key) << std::endl;
+    print_inorder_wins_helper(node->right);
 }
 
 

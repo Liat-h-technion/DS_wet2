@@ -112,3 +112,7 @@ void Team::unite_teams(Team &team2) {
 int Team::getId() const {
     return team_id;
 }
+
+Pair Team::get_pair_key() const {
+    return Pair(get_strength(), team_id);
+}

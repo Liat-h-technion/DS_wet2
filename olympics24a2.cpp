@@ -1,9 +1,6 @@
 #include "olympics24a2.h"
 
-olympics_t::olympics_t()
-{
-	// TODO: Your code goes here
-}
+olympics_t::olympics_t() {}
 
 olympics_t::~olympics_t()
 {
@@ -13,7 +10,11 @@ olympics_t::~olympics_t()
 
 StatusType olympics_t::add_team(int teamId)
 {
-	// TODO: Your code goes here
+	if (teamId <= 0) {
+
+    }
+    Team* new_team = new Team(teamId);
+
 	return StatusType::SUCCESS;
 }
 
