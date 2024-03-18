@@ -24,6 +24,7 @@ private:
     void rotateRight(Node* node, Node* parent);
     void reBalanceSubTree(Node* node, Node* parent);
     void deAllocateAllInfoHelper(Node* node);
+    void add_wins(const K& key, int x);
     void add_wins_helper(const K& key, int x, Node* node, bool right_streak);
     int get_index_from_key_helper(const K& key, Node* node);
 public:
@@ -43,7 +44,6 @@ public:
     void clearTree(Node* node);
     K getPrevKey(const K& key) const;
     int get_num_wins(const K& key);
-    void add_wins(const K& key, int x);
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
     K get_key_from_index(int idx);
@@ -814,7 +814,7 @@ void RankTree<K, T>::add_wins_helper(const K& key, int x, Node* node, bool right
 
 template<typename K, typename T>
 void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
-    if (min_key > max_key) {
+    if (min_key > max_key || x == 0) {
         return;
     }
     add_wins(max_key, x);
