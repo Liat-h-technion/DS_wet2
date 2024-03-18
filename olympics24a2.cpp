@@ -62,10 +62,17 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
         return StatusType::FAILURE;
     }
 
-
-    // Remove the team from the teams rank tree (and save the amount of wins the team has):
-    int wins = teams_rank_tree.get_num_wins(team->get_pair_key());
-    teams_rank_tree.erase(team->get_pair_key());
+    int wins = 0;
+    if (team->getSize() > 0) {
+        // Remove the team from the teams rank tree (and save the amount of wins the team has):
+        wins = teams_rank_tree.get_num_wins(team->get_pair_key());
+        teams_rank_tree.erase(team->get_pair_key());
+    }
+    else {
+        // If team is empty, use the previous number of wins from the team and reset previous_wins
+        wins = team->get_previous_wins();
+        team->set_previous_wins(0);
+    }
 
     // Add a player to the team:
     team->add_player(playerStrength);
@@ -101,6 +108,9 @@ StatusType olympics_t::remove_newest_player(int teamId)
         teams_rank_tree.insert(team->get_pair_key(), team);
         teams_rank_tree.add_wins_in_range(team->get_pair_key(), team->get_pair_key(), wins);
     }
+    else {
+        team->set_previous_wins(wins);
+    }
 	return StatusType::SUCCESS;
 }
 
@@ -124,6 +134,9 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
         return StatusType::FAILURE;
     }
 
+    if (team->getSize() == 0) {
+        return team->get_previous_wins();
+    }
     return teams_rank_tree.get_num_wins(team->get_pair_key());;
 }
 
