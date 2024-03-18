@@ -124,3 +124,10 @@ int Team::get_previous_wins() const {
 void Team::set_previous_wins(int wins) {
     previous_wins = wins;
 }
+
+bool Team::isEmpty() const {
+    if(this->getSize() == 0){
+        return true;
+    }
+    return false;
+}
