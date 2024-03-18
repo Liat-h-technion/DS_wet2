@@ -8,7 +8,7 @@ public:
     Pair data;
     Node * next;
 
-    Node(const Pair& data) : data(data), next(nullptr) {}
+    explicit Node(const Pair& data) : data(data), next(nullptr) {}
 };
 
 class Stack {
