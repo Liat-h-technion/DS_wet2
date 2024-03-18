@@ -104,18 +104,29 @@ StatusType olympics_t::remove_newest_player(int teamId)
 	return StatusType::SUCCESS;
 }
 
+
 output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 {
     // TODO: Your code goes here
     return 2008;
 }
 
+
 output_t<int> olympics_t::num_wins_for_team(int teamId)
 {
-    // TODO: Your code goes here
-    static int i = 0;
-    return (i++==0) ? 11 : 2;
+    if (teamId <= 0) {
+        return StatusType::INVALID_INPUT;
+    }
+
+    Team* team = teams_hash.find(teamId);
+    if (!team) {
+        // Team doesn't exist
+        return StatusType::FAILURE;
+    }
+
+    return teams_rank_tree.get_num_wins(team->get_pair_key());;
 }
+
 
 output_t<int> olympics_t::get_highest_ranked_team()
 {
