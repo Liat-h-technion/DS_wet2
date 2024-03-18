@@ -1,14 +1,14 @@
-// 
+//
 // 234218 Data Structures 1.
 // Semester: 2023B (spring).
 // Wet Exercise #1.
-// 
+//
 // Recommended TAB size to view this file: 8.
-// 
+//
 // The following main file is necessary to link and run your code.
 // This file is READ ONLY: even if you submit something else, the compiler ..
 // .. WILL use our file.
-// 
+//
 
 #include "olympics24a2.h"
 #include <string>
@@ -21,12 +21,12 @@ void print(string cmd, output_t<int> res);
 
 int main()
 {
-	
+
     int d1, d2;
 
     // Init
     olympics_t *obj = new olympics_t();
-	
+
     // Execute all commands in file
 	string op;
 	while (cin >> op)
@@ -68,7 +68,7 @@ int main()
         }
     }
 
-    // Quit 
+    // Quit
 	delete obj;
 	return 0;
 }
@@ -82,7 +82,7 @@ static const char *StatusTypeStr[] =
 	"FAILURE"
 };
 
-void print(string cmd, StatusType res) 
+void print(string cmd, StatusType res)
 {
 	cout << cmd << ": " << StatusTypeStr[(int) res] << endl;
 }
