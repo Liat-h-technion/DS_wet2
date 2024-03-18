@@ -47,12 +47,14 @@ public:
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
     int get_index_from_key(const K& key);
     K get_key_from_index(int idx);
-
+    int get_max_rank() const;
     // TODO: delete after done testing
     void print_inorder_indexes();
     void print_inorder_indexes_helper(Node* node);
     void print_inorder();
     void print_inorder_helper(Node* node);
+    void print_inorder_wins();
+    void print_inorder_wins_helper(Node* node);
 };
 
 
@@ -102,6 +104,12 @@ int RankTree<K, T>::get_num_wins(const K &key) {
             curr = curr->right;
         }
     }
+}
+
+
+template<typename K, typename T>
+int RankTree<K, T>::get_max_rank() const {
+    return root->max_rank;
 }
 
 template<typename K, typename T>
@@ -483,7 +491,7 @@ void RankTree<K,T>::eraseInner(const K &key, RankTree::Node *curr, RankTree::Nod
             }
             if (curr->left) {
                 curr->left->extra -= diff;
-                curr->right->updateMaxRank();
+                curr->left->updateMaxRank();
             }
             curr->updateMaxRank();
             eraseInner(key, curr->right, curr);
@@ -849,8 +857,24 @@ void RankTree<K, T>::print_inorder_helper(Node* node) {
         return;
     }
     print_inorder_helper(node->left);
-    std::cout << "id: " << node->key.second << " strength:  " << node->key.first << std::endl;
+    std::cout << "strength: " << node->key.first << " team_id:  " << node->key.second << std::endl;
     print_inorder_helper(node->right);
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_wins() {
+    print_inorder_wins_helper(root);
+}
+
+template<typename K, typename T>
+void RankTree<K, T>::print_inorder_wins_helper(Node* node) {
+    if (!node) {
+        return;
+    }
+    print_inorder_wins_helper(node->left);
+    std::cout << "strength: " << node->key.first << " team_id: " << node->key.second
+        << " wins: " << get_num_wins(node->key) << std::endl;
+    print_inorder_wins_helper(node->right);
 }
 
 

@@ -26,6 +26,7 @@ public:
     void add_player(int strength);
     void remove_newest_player();
     void unite_teams(Team& other_team);
+    Pair get_pair_key() const;
 };
 
 
