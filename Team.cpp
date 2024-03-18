@@ -8,7 +8,7 @@ int Team::get_strength() const {
     if (median_player == Player()) {
         return 0;
     }
-    return median_player.first;
+    return median_player.first * this->getSize();
 }
 
 void Team::add_player(int strength) {
@@ -71,7 +71,7 @@ void Team::unite_teams(Team &team2) {
     if (this->getSize() == 0) {
         this->players_tree = team2.players_tree;
         this->median_player = team2.median_player;
-        team2.players_tree = AVLTree<Player, nullptr_t>();
+        team2.players_tree = AVLTree<Player, std::nullptr_t>();
         team2.median_player = Player();
         return;
     }
@@ -91,7 +91,7 @@ void Team::unite_teams(Team &team2) {
     Player* merged_array = new Player[size1+size2];
     int actual_size = mergeSortedKeys(merged_array, array1, size1, array2, size2);
     // Fill a new tree from the merged array:
-    AVLTree<Player, nullptr_t> new_tree;
+    AVLTree<Player, std::nullptr_t> new_tree;
     new_tree.nearlyCompleteTree(actual_size, Player());
     new_tree.insertKeysInorderToArray(merged_array);
     this->players_tree = new_tree;

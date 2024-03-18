@@ -11,16 +11,41 @@ olympics_t::~olympics_t()
 StatusType olympics_t::add_team(int teamId)
 {
 	if (teamId <= 0) {
-
+        return StatusType::INVALID_INPUT;
     }
-    Team* new_team = new Team(teamId);
-
-	return StatusType::SUCCESS;
+    if(teams_hash.find(teamId)){
+        return StatusType::FAILURE;
+    }
+    try {
+        Team *new_team = new Team(teamId);
+        if (!new_team) {
+            return StatusType::ALLOCATION_ERROR;
+        }
+        teams_hash.insert(teamId, new_team);
+    }
+    catch(const std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
+    }
+    return StatusType::SUCCESS;
 }
 
 StatusType olympics_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
+    if(teamId<=0){
+        return StatusType::INVALID_INPUT;
+    }
+    Team* removed_team = teams_hash.find(teamId);
+    if(!removed_team){
+        return StatusType::FAILURE;
+    }
+    try{
+        teams_hash.erase(teamId);
+        teams_rank_tree.erase(removed_team->get_pair_key());
+        delete removed_team;
+    }
+    catch (const std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
+    }
 	return StatusType::SUCCESS;
 }
 
