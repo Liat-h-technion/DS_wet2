@@ -28,8 +28,8 @@ int main()
     olympics_t *obj = new olympics_t();
 
     // Execute all commands in file
-	string op;
-	while (cin >> op)
+    string op;
+    while (cin >> op)
     {
         if (!op.compare("add_team")) {
             cin >> d1;
@@ -69,29 +69,29 @@ int main()
     }
 
     // Quit
-	delete obj;
-	return 0;
+    delete obj;
+    return 0;
 }
 
 // Helpers
 static const char *StatusTypeStr[] =
-{
-   	"SUCCESS",
-	"ALLOCATION_ERROR",
-	"INVALID_INPUT",
-	"FAILURE"
-};
+        {
+                "SUCCESS",
+                "ALLOCATION_ERROR",
+                "INVALID_INPUT",
+                "FAILURE"
+        };
 
 void print(string cmd, StatusType res)
 {
-	cout << cmd << ": " << StatusTypeStr[(int) res] << endl;
+    cout << cmd << ": " << StatusTypeStr[(int) res] << endl;
 }
 
 void print(string cmd, output_t<int> res)
 {
     if (res.status() == StatusType::SUCCESS) {
-	    cout << cmd << ": " << StatusTypeStr[(int) res.status()] << ", " << res.ans() << endl;
+        cout << cmd << ": " << StatusTypeStr[(int) res.status()] << ", " << res.ans() << endl;
     } else {
-	    cout << cmd << ": " << StatusTypeStr[(int) res.status()] << endl;
+        cout << cmd << ": " << StatusTypeStr[(int) res.status()] << endl;
     }
 }
