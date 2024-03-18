@@ -125,7 +125,7 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
         teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
     }
     if(first_score == second_score){
-        if(teamId1 > teamId2){
+        if(teamId1 < teamId2){
             teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
         }
         else{
@@ -154,8 +154,7 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 
 output_t<int> olympics_t::get_highest_ranked_team()
 {
-	// TODO: Your code goes here
-    return 42;
+	return teams_rank_tree.get_max_rank();
 }
 
 StatusType olympics_t::unite_teams(int teamId1, int teamId2)
