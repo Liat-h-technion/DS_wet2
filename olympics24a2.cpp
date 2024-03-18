@@ -167,6 +167,12 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 
 output_t<int> olympics_t::get_highest_ranked_team()
 {
+    if(teams_hash.isEmpty()){
+        return -1;
+    }
+    if(teams_rank_tree.isEmpty()){
+        return 0;
+    }
 	return teams_rank_tree.get_max_rank();
 }
 

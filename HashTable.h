@@ -22,7 +22,13 @@ public:
     void insert(int key, T* info);
     void erase(int key);
     T* find(int key);
+    bool isEmpty() const;
 };
+
+template<typename T>
+bool HashTable<T>::isEmpty() const {
+    return used_size ==0;
+}
 
 
 template<typename T>
