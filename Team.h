@@ -13,12 +13,13 @@ private:
     Stack players_stack;
     AVLTree<Player,std::nullptr_t> players_tree;
     Player median_player;
+    int previous_wins;
 
     void update_median_in_insert(Player new_player);
     void update_median_in_erase(Player new_player);
 
 public:
-    explicit Team(int team_id) : team_id(team_id) {};
+    explicit Team(int team_id) : team_id(team_id), previous_wins(0) {};
     ~Team() = default;
     int getSize() const;
     int getId() const;
@@ -28,6 +29,8 @@ public:
     void unite_teams(Team& other_team);
     Pair get_pair_key() const;
     bool isEmpty() const;
+    int get_previous_wins() const;
+    void set_previous_wins(int wins);
 };
 
 

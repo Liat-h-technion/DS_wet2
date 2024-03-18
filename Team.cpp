@@ -117,6 +117,14 @@ Pair Team::get_pair_key() const {
     return Pair(get_strength(), team_id);
 }
 
+int Team::get_previous_wins() const {
+    return previous_wins;
+}
+
+void Team::set_previous_wins(int wins) {
+    previous_wins = wins;
+}
+
 bool Team::isEmpty() const {
     if(this->getSize() == 0){
         return true;
