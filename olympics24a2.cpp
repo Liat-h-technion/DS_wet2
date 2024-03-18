@@ -115,16 +115,16 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     if(!team1 || !team2 || team1->isEmpty() || team2->isEmpty()){
         return StatusType::FAILURE;
     }
-    int first_score = 0, second_score = 0;
+    int first_score, second_score;
     first_score = team1->get_strength();
     second_score = team2->get_strength();
     if(first_score > second_score){
         teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
     }
-    if(first_score < second_score){
+    else if(first_score < second_score){
         teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
     }
-    if(first_score == second_score){
+    else{  //(first_score == second_score)
         if(teamId1 < teamId2){
             teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
         }
