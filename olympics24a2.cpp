@@ -178,7 +178,44 @@ output_t<int> olympics_t::get_highest_ranked_team()
 
 StatusType olympics_t::unite_teams(int teamId1, int teamId2)
 {
-	// TODO: Your code goes here
+    if (teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
+        return StatusType::INVALID_INPUT;
+    }
+    Team* team1 = teams_hash.find(teamId1);
+    Team* team2 = teams_hash.find(teamId2);
+    if (!team1 || !team2) {
+        return StatusType::FAILURE;
+    }
+
+    // Remove both teams from the teams rank tree (and save the amount of wins team1 has):
+    int wins = 0;
+    if (team1->getSize() > 0) {
+        // Remove the team from the teams rank tree (and save the amount of wins the team has):
+        wins = teams_rank_tree.get_num_wins(team1->get_pair_key());
+        teams_rank_tree.erase(team1->get_pair_key());
+    }
+    else {
+        // If team is empty, use the previous number of wins from the team and reset previous_wins
+        wins = team1->get_previous_wins();
+        team1->set_previous_wins(0);
+    }
+    teams_rank_tree.erase(team2->get_pair_key());
+
+    // Unite the teams:
+    team1->unite_teams(*team2);
+
+    // If team1 is not empty, re-add it to the teams rank tree (and re-add the wins)
+    if (team1->getSize() > 0) {
+        teams_rank_tree.insert(team1->get_pair_key(), team1);
+        teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), wins);
+    }
+    else {
+        team1->set_previous_wins(wins);
+    }
+
+    // Remove team2 from olympics
+    remove_team(teamId2);
+
     return StatusType::SUCCESS;
 }
 
