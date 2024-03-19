@@ -93,8 +93,8 @@ void Team::unite_teams(Team &team2) {
     // Fill a new tree from the merged array:
     AVLTree<Player, std::nullptr_t> new_tree;
     new_tree.nearlyCompleteTree(actual_size, Player());
-    new_tree.insertKeysInorderToArray(merged_array);
-    this->players_tree = new_tree;
+    new_tree.insertKeysInorderToTree(merged_array);
+    this->players_tree.swapTrees(new_tree);
 
     // Update the median: Find the new median in the merged array according to the size
     int median_idx = actual_size / 2;
