@@ -130,19 +130,22 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
     second_score = team2->get_strength();
     if(first_score > second_score){
         teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
+        return teamId1;
     }
     else if(first_score < second_score){
         teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
+        return teamId2;
     }
     else{  //(first_score == second_score)
         if(teamId1 < teamId2){
             teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), 1);
+            return teamId1;
         }
         else{
             teams_rank_tree.add_wins_in_range(team2->get_pair_key(), team2->get_pair_key(), 1);
+            return teamId2;
         }
     }
-    return StatusType::SUCCESS;
 }
 
 
