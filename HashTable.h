@@ -23,7 +23,15 @@ public:
     void erase(int key);
     T* find(int key);
     bool isEmpty() const;
+    void deAllocateAllInfo();
 };
+
+template<typename T>
+void HashTable<T>::deAllocateAllInfo() {
+    for (int i=0; i<size; i++) {
+        table[i].deAllocateAllInfo();
+    }
+}
 
 template<typename T>
 bool HashTable<T>::isEmpty() const {

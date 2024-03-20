@@ -4,7 +4,7 @@ olympics_t::olympics_t() {}
 
 olympics_t::~olympics_t()
 {
-	// TODO: Your code goes here
+    teams_hash.deAllocateAllInfo();
 }
 
 
