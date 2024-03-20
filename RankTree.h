@@ -104,6 +104,7 @@ int RankTree<K, T>::get_num_wins(const K &key) {
             curr = curr->right;
         }
     }
+    return wins;
 }
 
 
