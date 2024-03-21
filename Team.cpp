@@ -1,9 +1,14 @@
 #include "Team.h"
 
+/* Complexity: time: O(1), space: O(1)
+ */
 int Team::getSize() const {
     return players_tree.getSize();
 }
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 int Team::get_strength() const {
     if (median_player == Player()) {
         return 0;
@@ -11,6 +16,8 @@ int Team::get_strength() const {
     return median_player.first * this->getSize();
 }
 
+/* Complexity: time: O(log k), space: O(log k)
+ */
 void Team::add_player(int strength) {
     int player_id = this->getSize() + 1;
     Player player = Player(strength, player_id);
@@ -19,6 +26,8 @@ void Team::add_player(int strength) {
     update_median_in_insert(player);
 }
 
+/* Complexity: time: O(log k), space: O(1)
+ */
 void Team::update_median_in_insert(Player new_player) {
     if (this->getSize() == 1) {
         median_player = new_player;
@@ -31,6 +40,8 @@ void Team::update_median_in_insert(Player new_player) {
     }
 }
 
+/* Complexity: time: O(log k), space: O(1)
+ */
 void Team::update_median_in_erase(Player removed_player) {
     if (this->getSize() == 0) {
         median_player = Player();
@@ -43,6 +54,9 @@ void Team::update_median_in_erase(Player removed_player) {
     }
 }
 
+
+/* Complexity: time: O(log k), space: O(log k)
+ */
 void Team::remove_newest_player() {
     if (this->getSize() == 0) {
         return;
@@ -52,6 +66,9 @@ void Team::remove_newest_player() {
     update_median_in_erase(removed_player);
 }
 
+
+/* Complexity: time: O(k1 + k2), space: O(k1 + k2)
+ */
 void Team::unite_teams(Team &team2) {
     if (team2.getSize() == 0) {
         return;
@@ -105,22 +122,33 @@ void Team::unite_teams(Team &team2) {
     delete[] merged_array;
 }
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 int Team::getId() const {
     return team_id;
 }
 
+/* Complexity: time: O(1), space: O(1)
+ */
 Pair Team::get_pair_key() const {
     return Pair(get_strength(), team_id);
 }
 
+/* Complexity: time: O(1), space: O(1)
+ */
 int Team::get_previous_wins() const {
     return previous_wins;
 }
 
+/* Complexity: time: O(1), space: O(1)
+ */
 void Team::set_previous_wins(int wins) {
     previous_wins = wins;
 }
 
+/* Complexity: time: O(1), space: O(1)
+ */
 bool Team::isEmpty() const {
     if(this->getSize() == 0){
         return true;

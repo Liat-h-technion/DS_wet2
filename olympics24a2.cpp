@@ -1,13 +1,21 @@
 #include "olympics24a2.h"
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 olympics_t::olympics_t() {}
 
+
+/* Complexity: time: O(n+k) worst case, space: O(1) amortized on average
+ */
 olympics_t::~olympics_t()
 {
     teams_hash.deAllocateAllInfo();
 }
 
 
+/* Complexity: time: O(1) Amortized on average
+ */
 StatusType olympics_t::add_team(int teamId)
 {
 	if (teamId <= 0) {
@@ -29,6 +37,9 @@ StatusType olympics_t::add_team(int teamId)
     return StatusType::SUCCESS;
 }
 
+/* Complexity: time: O( log n +k(in team) ) Amortized on average
+ * (because remove from hash table is O(1) amortized, and remove from rank tree is O(log n)
+ */
 StatusType olympics_t::remove_team(int teamId)
 {
     if(teamId<=0){
@@ -50,6 +61,8 @@ StatusType olympics_t::remove_team(int teamId)
 }
 
 
+/* Complexity: time: O( log n + log k ) worst case
+ */
 StatusType olympics_t::add_player(int teamId, int playerStrength)
 {
 	if (teamId <= 0 || playerStrength <= 0) {
@@ -84,6 +97,8 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
 }
 
 
+/* Complexity: time: O( log n + log k ) worst case
+ */
 StatusType olympics_t::remove_newest_player(int teamId)
 {
     if (teamId <= 0) {
@@ -115,6 +130,8 @@ StatusType olympics_t::remove_newest_player(int teamId)
 }
 
 
+/* Complexity: time: O(log n) worst case
+ */
 output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 {
     if(teamId1<=0 || teamId2<=0 || teamId1 == teamId2){
@@ -149,6 +166,8 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 }
 
 
+/* Complexity: time: O(log n) worst case
+ */
 output_t<int> olympics_t::num_wins_for_team(int teamId)
 {
     if (teamId <= 0) {
@@ -168,6 +187,8 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 }
 
 
+/* Complexity: time: O(1) worst case
+ */
 output_t<int> olympics_t::get_highest_ranked_team()
 {
     if(teams_hash.isEmpty()){
@@ -179,6 +200,9 @@ output_t<int> olympics_t::get_highest_ranked_team()
 	return teams_rank_tree.get_max_rank();
 }
 
+
+/* Complexity: time: O(log n + k1 + k2 ) Amortized on average (because of the remove_team)
+ */
 StatusType olympics_t::unite_teams(int teamId1, int teamId2)
 {
     if (teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
@@ -222,6 +246,7 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     return StatusType::SUCCESS;
 }
 
+
 bool power_of_two(int x) {
     if (x <= 1) {
         return false;
@@ -232,6 +257,9 @@ bool power_of_two(int x) {
     return false;
 }
 
+
+/* Complexity: time: O( (log i)*(log n) ) worst case
+ */
 output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
 {
     if (lowPower <= 0 || highPower <= 0 || highPower <= lowPower) {

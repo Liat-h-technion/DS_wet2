@@ -69,17 +69,24 @@ public:
 };
 
 
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename K, typename T>
 K AVLTree<K, T>::getRootKey() const {
     return root->key;
 }
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename K, typename T>
 T *AVLTree<K, T>::getRootInfo() const {
     return root->info;
 }
 
 
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 K AVLTree<K, T>::getNextKey(const K& key, const K& default_key) const {
     Node *next_node = nullptr;
@@ -109,6 +116,8 @@ K AVLTree<K, T>::getNextKey(const K& key, const K& default_key) const {
 }
 
 
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 K AVLTree<K, T>::getPrevKey(const K &key, const K &default_key) const {
     Node *prev_node = nullptr;

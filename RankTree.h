@@ -79,6 +79,8 @@ public:
 };
 
 
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 int RankTree<K, T>::get_num_wins(const K &key) {
     if (!find(key)) {
@@ -103,11 +105,16 @@ int RankTree<K, T>::get_num_wins(const K &key) {
 }
 
 
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename K, typename T>
 int RankTree<K, T>::get_max_rank() const {
     return root->max_rank;
 }
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename K, typename T>
 void RankTree<K, T>::Node::updateSubtreeSize() {
     subtree_size = 1;
@@ -120,6 +127,8 @@ void RankTree<K, T>::Node::updateSubtreeSize() {
 }
 
 
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename K, typename T>
 void RankTree<K, T>::Node::updateMaxRank() {
     this->max_rank = this->info->get_strength() + this->extra;
@@ -132,6 +141,8 @@ void RankTree<K, T>::Node::updateMaxRank() {
 }
 
 
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 K RankTree<K, T>::getPrevKey(const K &key) const {
     Node *prev_node = nullptr;
@@ -161,6 +172,8 @@ K RankTree<K, T>::getPrevKey(const K &key) const {
 }
 
 
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 K RankTree<K, T>::getNextKey(const K& key) const {
     Node *next_node = nullptr;
@@ -663,6 +676,8 @@ void RankTree<K,T>::clearTree(RankTree::Node* node) {
 }
 
 
+/* Complexity: time: O(log n), space: O(log n)
+ */
 template<typename K, typename T>
 int RankTree<K, T>::get_index_from_key(const K& key){
     if(find(key) == nullptr){
@@ -671,6 +686,9 @@ int RankTree<K, T>::get_index_from_key(const K& key){
     return get_index_from_key_helper(key, root);
 }
 
+
+/* Complexity: time: O(log n), space: O(log n)
+ */
 template<typename K, typename T>
 int RankTree<K, T>::get_index_from_key_helper(const K& key, Node* node) {
     int left_subTree_size = 0;
@@ -688,6 +706,9 @@ int RankTree<K, T>::get_index_from_key_helper(const K& key, Node* node) {
     }
 }
 
+
+/* Complexity: time: O(log n), space: O(1)
+ */
 template<typename K, typename T>
 K RankTree<K, T>::get_key_from_index(int idx){
     if(idx <= 0 || idx > size){
@@ -715,6 +736,9 @@ K RankTree<K, T>::get_key_from_index(int idx){
     return default_key;
 }
 
+
+/* Complexity: time: O(log n), space: O(log n)
+ */
 template<typename K, typename T>
 void RankTree<K, T>::add_wins(const K& key, int x){
     if(find(key) == nullptr){
@@ -724,6 +748,8 @@ void RankTree<K, T>::add_wins(const K& key, int x){
 }
 
 
+/* Complexity: time: O(log n), space: O(log n)
+ */
 template<typename K, typename T>
 void RankTree<K, T>::add_wins_helper(const K& key, int x, Node* node, bool right_streak){
     if(node->key == key){
@@ -756,6 +782,8 @@ void RankTree<K, T>::add_wins_helper(const K& key, int x, Node* node, bool right
 }
 
 
+/* Complexity: time: O(log n), space: O(log n)
+ */
 template<typename K, typename T>
 void RankTree<K, T>::add_wins_in_range(const K &min_key, const K &max_key, int x) {
     if (min_key > max_key || x == 0) {
