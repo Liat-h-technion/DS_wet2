@@ -36,11 +36,7 @@ public:
     bool insert(const K& key, T* info);
     bool erase(const K& key);
     T* find(const K& key);
-    const K& getMaxKey() const;
-    const K& getMinKey() const;
     int getSize() const;
-    T* getMaxKeyInfo() const;
-    T* getMinKeyInfo() const;
     T* getRootInfo() const;
     K getRootKey() const;
     K getNextKey(const K& key, const K& default_key) const;
@@ -142,70 +138,12 @@ K AVLTree<K, T>::getPrevKey(const K &key, const K &default_key) const {
 }
 
 
-/* Complexity: time: O(log n), space: O(1)
- * Returns reference to the max key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-const K &AVLTree<K, T>::getMaxKey() const {
-    Node* curr = root;
-    while (curr->right != nullptr) {
-        curr = curr->right;
-    }
-    return curr->key;
-}
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns reference to the min key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-const K& AVLTree<K, T>::getMinKey() const{
-    Node* curr = root;
-    while (curr->left != nullptr) {
-        curr = curr->left;
-    }
-    return curr->key;
-}
-
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns the info of the max key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-T *AVLTree<K, T>::getMaxKeyInfo() const {
-    Node* curr = root;
-    while (curr->right != nullptr) {
-        curr = curr->right;
-    }
-    return curr->getInfo();
-}
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns the info of the min key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-T *AVLTree<K, T>::getMinKeyInfo() const {
-    Node* curr = root;
-    while (curr->left != nullptr) {
-        curr = curr->left;
-    }
-    return curr->getInfo();
-}
-
-
 /* Complexity: time: O(1), space: O(1)
  * Returns the trees size. */
 template<typename K, typename T>
 int AVLTree<K, T>::getSize() const{
     return size;
 }
-
 
 
 /* Complexity: time: O(1), space: O(1)

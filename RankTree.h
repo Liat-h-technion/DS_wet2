@@ -23,7 +23,6 @@ private:
     void rotateLeft(Node* node, Node* parent);
     void rotateRight(Node* node, Node* parent);
     void reBalanceSubTree(Node* node, Node* parent);
-    void deAllocateAllInfoHelper(Node* node);
     void add_wins(const K& key, int x);
     void add_wins_helper(const K& key, int x, Node* node, bool right_streak);
     int get_index_from_key_helper(const K& key, Node* node);
@@ -35,12 +34,7 @@ public:
     bool insert(const K& key, T* info);
     bool erase(const K& key);
     T* find(const K& key);
-    const K& getMaxKey() const;
-    const K& getMinKey() const;
     int getSize() const;
-    T* getMaxKeyInfo() const;
-    T* getMinKeyInfo() const;
-    void deAllocateAllInfo();
     void clearTree(Node* node);
     K getNextKey(const K& key) const;
     K getPrevKey(const K& key) const;
@@ -196,71 +190,12 @@ K RankTree<K, T>::getNextKey(const K& key) const {
 }
 
 
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns reference to the max key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-const K &RankTree<K, T>::getMaxKey() const {
-    Node* curr = root;
-    while (curr->right != nullptr) {
-        curr = curr->right;
-    }
-    return curr->key;
-}
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns reference to the min key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-const K& RankTree<K, T>::getMinKey() const{
-    Node* curr = root;
-    while (curr->left != nullptr) {
-        curr = curr->left;
-    }
-    return curr->key;
-}
-
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns the info of the max key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-T *RankTree<K, T>::getMaxKeyInfo() const {
-    Node* curr = root;
-    while (curr->right != nullptr) {
-        curr = curr->right;
-    }
-    return curr->getInfo();
-}
-
-
-/* Complexity: time: O(log n), space: O(1)
- * Returns the info of the min key in the tree. (log(n))
- * The function assumes the tree is not empty
- */
-template<typename K, typename T>
-T *RankTree<K, T>::getMinKeyInfo() const {
-    Node* curr = root;
-    while (curr->left != nullptr) {
-        curr = curr->left;
-    }
-    return curr->getInfo();
-}
-
-
 /* Complexity: time: O(1), space: O(1)
  * Returns the trees size. */
 template<typename K, typename T>
 int RankTree<K, T>::getSize() const{
     return size;
 }
-
 
 
 /* Complexity: time: O(1), space: O(1)
@@ -727,29 +662,6 @@ void RankTree<K,T>::clearTree(RankTree::Node* node) {
     size -= 1;
 }
 
-
-/* Complexity: time: O(n), space: O(log n)
- */
-template<typename K, typename T>
-void RankTree<K, T>::deAllocateAllInfo() {
-    deAllocateAllInfoHelper(root);
-}
-
-/* Complexity: time: O(n), space: O(log n)
- * De-allocates the info of all the nodes in the tree using postorder traversal.
- * Should only be used by the owner of the info's memory.
- */
-template<typename K, typename T>
-void RankTree<K, T>::deAllocateAllInfoHelper(RankTree::Node* node) {
-    if (node == nullptr) {
-        return;
-    }
-    deAllocateAllInfoHelper(node->left);
-    deAllocateAllInfoHelper(node->right);
-    T* info = node->info;
-    node->info = nullptr;
-    delete info;
-}
 
 template<typename K, typename T>
 int RankTree<K, T>::get_index_from_key(const K& key){
