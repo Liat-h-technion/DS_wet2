@@ -222,9 +222,48 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     return StatusType::SUCCESS;
 }
 
+bool power_of_two(int x) {
+    if (x <= 1) {
+        return false;
+    }
+    if (ceil(log2(x)) == floor(log2(x))) {
+        return true;
+    }
+    return false;
+}
+
 output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
 {
-    // TODO: Your code goes here
-    static int i = 0;
-    return (i++==0) ? 11 : 2;
+    if (lowPower <= 0 || highPower <= 0 || highPower <= lowPower) {
+        return StatusType::INVALID_INPUT;
+    }
+
+    // Find the lowest key in which strength >= lowPower, and the highest key in which  strength <= highPower
+    Pair low_team_key = teams_rank_tree.getNextKey(Pair(lowPower-1, -1));
+    Pair high_team_key = teams_rank_tree.getPrevKey(Pair(highPower, -1));
+
+    if (low_team_key == Pair() || high_team_key == Pair()) {
+        return StatusType::FAILURE;
+    }
+
+    // Get indexes of low and high teams in tournament:
+    int low_index = teams_rank_tree.get_index_from_key(low_team_key);
+    int high_index = teams_rank_tree.get_index_from_key(high_team_key);
+    int count_teams_in_tournament = high_index - low_index + 1;
+    if (low_index > high_index || low_index < 1 || high_index > teams_rank_tree.getSize() ||
+        !power_of_two(count_teams_in_tournament)) {
+        // Indexes must be valid, and amount of teams in tournament must be a power of 2
+        return StatusType::FAILURE;
+    }
+
+    // Run for log(count_teams_in_tournament) iterations, each add a win to all teams between median and high,
+    // And update low to be the median
+    for (int i=1; i<=log(count_teams_in_tournament); i++) {
+        int mid = (high_index - low_index + 1) / 2 + low_index;
+        Pair mid_team_key = teams_rank_tree.get_key_from_index(mid);
+        teams_rank_tree.add_wins_in_range(mid_team_key, high_team_key, 1);
+        low_index = mid;
+    }
+
+    return high_team_key.second; // Return the winning team id
 }

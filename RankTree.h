@@ -42,6 +42,7 @@ public:
     T* getMinKeyInfo() const;
     void deAllocateAllInfo();
     void clearTree(Node* node);
+    K getNextKey(const K& key) const;
     K getPrevKey(const K& key) const;
     int get_num_wins(const K& key);
     void add_wins_in_range(const K& min_key, const K& max_key, int x);
@@ -164,6 +165,36 @@ K RankTree<K, T>::getPrevKey(const K &key) const {
     }
     return curr->key;
 }
+
+
+template<typename K, typename T>
+K RankTree<K, T>::getNextKey(const K& key) const {
+    Node *next_node = nullptr;
+    Node *curr = root;
+    while (curr != nullptr) {
+        if (curr->key == key) {
+            break;
+        } else if (curr->key > key) {
+            next_node = curr;
+            curr = curr->left;
+        } else {
+            curr = curr->right;
+        }
+    }
+
+    if (!curr || !curr->right) {
+        if (next_node) {
+            return next_node->key;
+        }
+        return default_key;
+    }
+    curr = curr->right;
+    while (curr->left) {
+        curr = curr->left;
+    }
+    return curr->key;
+}
+
 
 
 /* Complexity: time: O(log n), space: O(1)
