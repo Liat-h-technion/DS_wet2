@@ -9,7 +9,6 @@ private:
     int size;
     int used_size;
     AVLTree<int, T>* table;
-    const double MAX_LOAD = 0.75;
     const double MIN_LOAD = 0.25;
     const int INIT_SIZE = 4;
 
@@ -26,6 +25,8 @@ public:
     void deAllocateAllInfo();
 };
 
+/* Complexity: time: O(n), space: O(1)
+ */
 template<typename T>
 void HashTable<T>::deAllocateAllInfo() {
     for (int i=0; i<size; i++) {
@@ -39,6 +40,8 @@ bool HashTable<T>::isEmpty() const {
 }
 
 
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename T>
 HashTable<T>::HashTable() {
     size = INIT_SIZE;
@@ -47,19 +50,24 @@ HashTable<T>::HashTable() {
 }
 
 
+/* Complexity: time: O(n), space: O(1)
+ */
 template<typename T>
 HashTable<T>::~HashTable() {
     delete[] table;
 }
 
 
+/* Complexity: time: O(1), space: O(1)
+ */
 template<typename T>
 int HashTable<T>::hashKey(int key) {
     return key % size;
 }
 
 
-/* If item was not found, returns nullptr
+/* Complexity: time: O(1) Amortized on average, space: O(1)
+ * If item was not found, returns nullptr
  */
 template<typename T>
 T* HashTable<T>::find(int key) {
@@ -68,6 +76,8 @@ T* HashTable<T>::find(int key) {
 }
 
 
+/* Complexity: time: O(1) Amortized on average, space: O(n)
+ */
 template<typename T>
 void HashTable<T>::insert(int key, T* info) {
     int hashed_key = hashKey(key);
@@ -77,6 +87,8 @@ void HashTable<T>::insert(int key, T* info) {
 }
 
 
+/* Complexity: time: O(1) Amortized on average, space: O(1)
+ */
 template<typename T>
 void HashTable<T>::erase(int key) {
     int hashed_key = hashKey(key);
@@ -86,15 +98,17 @@ void HashTable<T>::erase(int key) {
 }
 
 
+/* Complexity: time: O(1) Amortized on average, space: O(n)
+ */
 template<typename T>
 void HashTable<T>::resize() {
-    if ((used_size < size*MAX_LOAD) && (used_size > size*MIN_LOAD || size == INIT_SIZE)) {
+    if ((used_size < size) && (used_size > size*MIN_LOAD || size == INIT_SIZE)) {
         return;
     }
 
     AVLTree<int, T>* new_table;
     int old_size = size;
-    if ((used_size >= size*MAX_LOAD)) {
+    if ((used_size >= size)) {
         size *= 2;
         new_table = new AVLTree<int, T>[size];
     }

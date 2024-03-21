@@ -1,13 +1,21 @@
 #include "olympics24a2.h"
 
+
+/* Complexity: time: O(1), space: O(1)
+ */
 olympics_t::olympics_t() {}
 
+
+/* Complexity: time: O(n+k) worst case, space: O(1) amortized on average
+ */
 olympics_t::~olympics_t()
 {
     teams_hash.deAllocateAllInfo();
 }
 
 
+/* Complexity: time: O(1) Amortized on average
+ */
 StatusType olympics_t::add_team(int teamId)
 {
 	if (teamId <= 0) {
@@ -29,6 +37,9 @@ StatusType olympics_t::add_team(int teamId)
     return StatusType::SUCCESS;
 }
 
+/* Complexity: time: O( log n +k(in team) ) Amortized on average
+ * (because remove from hash table is O(1) amortized, and remove from rank tree is O(log n)
+ */
 StatusType olympics_t::remove_team(int teamId)
 {
     if(teamId<=0){
@@ -50,6 +61,8 @@ StatusType olympics_t::remove_team(int teamId)
 }
 
 
+/* Complexity: time: O( log n + log k ) worst case
+ */
 StatusType olympics_t::add_player(int teamId, int playerStrength)
 {
 	if (teamId <= 0 || playerStrength <= 0) {
@@ -84,6 +97,8 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
 }
 
 
+/* Complexity: time: O( log n + log k ) worst case
+ */
 StatusType olympics_t::remove_newest_player(int teamId)
 {
     if (teamId <= 0) {
@@ -115,6 +130,8 @@ StatusType olympics_t::remove_newest_player(int teamId)
 }
 
 
+/* Complexity: time: O(log n) worst case
+ */
 output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 {
     if(teamId1<=0 || teamId2<=0 || teamId1 == teamId2){
@@ -149,6 +166,8 @@ output_t<int> olympics_t::play_match(int teamId1, int teamId2)
 }
 
 
+/* Complexity: time: O(log n) worst case
+ */
 output_t<int> olympics_t::num_wins_for_team(int teamId)
 {
     if (teamId <= 0) {
@@ -168,6 +187,8 @@ output_t<int> olympics_t::num_wins_for_team(int teamId)
 }
 
 
+/* Complexity: time: O(1) worst case
+ */
 output_t<int> olympics_t::get_highest_ranked_team()
 {
     if(teams_hash.isEmpty()){
@@ -179,6 +200,9 @@ output_t<int> olympics_t::get_highest_ranked_team()
 	return teams_rank_tree.get_max_rank();
 }
 
+
+/* Complexity: time: O(log n + k1 + k2 ) Amortized on average (because of the remove_team)
+ */
 StatusType olympics_t::unite_teams(int teamId1, int teamId2)
 {
     if (teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2) {
@@ -222,9 +246,52 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     return StatusType::SUCCESS;
 }
 
+
+bool power_of_two(int x) {
+    if (x <= 1) {
+        return false;
+    }
+    if (ceil(log2(x)) == floor(log2(x))) {
+        return true;
+    }
+    return false;
+}
+
+
+/* Complexity: time: O( (log i)*(log n) ) worst case
+ */
 output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
 {
-    // TODO: Your code goes here
-    static int i = 0;
-    return (i++==0) ? 11 : 2;
+    if (lowPower <= 0 || highPower <= 0 || highPower <= lowPower) {
+        return StatusType::INVALID_INPUT;
+    }
+
+    // Find the lowest key in which strength >= lowPower, and the highest key in which  strength <= highPower
+    Pair low_team_key = teams_rank_tree.getNextKey(Pair(lowPower-1, -1));
+    Pair high_team_key = teams_rank_tree.getPrevKey(Pair(highPower, -1));
+
+    if (low_team_key == Pair() || high_team_key == Pair()) {
+        return StatusType::FAILURE;
+    }
+
+    // Get indexes of low and high teams in tournament:
+    int low_index = teams_rank_tree.get_index_from_key(low_team_key);
+    int high_index = teams_rank_tree.get_index_from_key(high_team_key);
+    int count_teams_in_tournament = high_index - low_index + 1;
+    if (low_index > high_index || low_index < 1 || high_index > teams_rank_tree.getSize() ||
+        !power_of_two(count_teams_in_tournament)) {
+        // Indexes must be valid, and amount of teams in tournament must be a power of 2
+        return StatusType::FAILURE;
+    }
+
+    // Run for log(count_teams_in_tournament) iterations, each add a win to all teams between median and high,
+    // And update low to be the median
+    for (int i=1; i<=log(count_teams_in_tournament); i++) {
+        int mid = (high_index - low_index + 1) / 2 + low_index;
+        Pair mid_team_key = teams_rank_tree.get_key_from_index(mid);
+        teams_rank_tree.add_wins_in_range(mid_team_key, high_team_key, 1);
+        low_index = mid;
+    }
+
+    return high_team_key.second; // Return the winning team id
 }

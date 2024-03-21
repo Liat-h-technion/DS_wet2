@@ -20,6 +20,7 @@ private:
 
 public:
     explicit Team(int team_id) : team_id(team_id), previous_wins(0) {};
+    /* ~Team() complexity: time: O(k), space: O(1) */
     ~Team() = default;
     int getSize() const;
     int getId() const;

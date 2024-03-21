@@ -17,14 +17,17 @@ private:
     int size;
 
 public:
+    /* Complexity: time: O(1), space: O(1)*/
     Stack() : top(nullptr), size(0) {}
 
+    /* Complexity: time: O(n), space: O(1)*/
     ~Stack() {
         while (!isEmpty()) {
             pop();
         }
     }
 
+    /* Complexity: time: O(1), space: O(1)*/
     void push(const Pair& data) {
         Node* newNode = new Node(data);
         newNode->next = top;
@@ -32,6 +35,7 @@ public:
         size++;
     }
 
+    /* Complexity: time: O(1), space: O(1)*/
     Pair pop() {
         if (!isEmpty()) {
             Pair topData = top->data;
@@ -44,10 +48,12 @@ public:
         return Pair();
     }
 
+    /* Complexity: time: O(1), space: O(1)*/
     bool isEmpty() const {
         return top == nullptr;
     }
 
+    /* Complexity: time: O(1), space: O(1)*/
     int getSize() const {
         return size;
     }
