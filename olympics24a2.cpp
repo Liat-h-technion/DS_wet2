@@ -286,7 +286,7 @@ output_t<int> olympics_t::play_tournament(int lowPower, int highPower)
 
     // Run for log(count_teams_in_tournament) iterations, each add a win to all teams between median and high,
     // And update low to be the median
-    for (int i=1; i<=log(count_teams_in_tournament); i++) {
+    for (int i=1; i<=log2(count_teams_in_tournament); i++) {
         int mid = (high_index - low_index + 1) / 2 + low_index;
         Pair mid_team_key = teams_rank_tree.get_key_from_index(mid);
         teams_rank_tree.add_wins_in_range(mid_team_key, high_team_key, 1);
