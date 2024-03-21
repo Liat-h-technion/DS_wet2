@@ -97,11 +97,7 @@ void Team::unite_teams(Team &team2) {
     this->players_tree.swapTrees(new_tree);
 
     // Update the median: Find the new median in the merged array according to the size
-    int median_idx = actual_size / 2;
-    if (actual_size % 2 == 0) {
-        median_idx += 1;
-    }
-    this->median_player = merged_array[median_idx];
+    this->median_player = merged_array[actual_size / 2];
 
     // de-allocate temp arrays
     delete[] array1;
