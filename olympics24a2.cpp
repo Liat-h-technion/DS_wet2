@@ -248,9 +248,6 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
 
 
 bool power_of_two(int x) {
-    if (x <= 1) {
-        return false;
-    }
     if (ceil(log2(x)) == floor(log2(x))) {
         return true;
     }
