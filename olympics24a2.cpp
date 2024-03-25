@@ -74,25 +74,28 @@ StatusType olympics_t::add_player(int teamId, int playerStrength)
         // Team doesn't exist
         return StatusType::FAILURE;
     }
+    try {
+        int wins = 0;
+        if (team->getSize() > 0) {
+            // Remove the team from the teams rank tree (and save the amount of wins the team has):
+            wins = teams_rank_tree.get_num_wins(team->get_pair_key());
+            teams_rank_tree.erase(team->get_pair_key());
+        } else {
+            // If team is empty, use the previous number of wins from the team and reset previous_wins
+            wins = team->get_previous_wins();
+            team->set_previous_wins(0);
+        }
 
-    int wins = 0;
-    if (team->getSize() > 0) {
-        // Remove the team from the teams rank tree (and save the amount of wins the team has):
-        wins = teams_rank_tree.get_num_wins(team->get_pair_key());
-        teams_rank_tree.erase(team->get_pair_key());
+        // Add a player to the team:
+        team->add_player(playerStrength);
+
+        // Re-add the team to the teams rank tree (and re-add the wins)
+        teams_rank_tree.insert(team->get_pair_key(), team);
+        teams_rank_tree.add_wins_in_range(team->get_pair_key(), team->get_pair_key(), wins);
     }
-    else {
-        // If team is empty, use the previous number of wins from the team and reset previous_wins
-        wins = team->get_previous_wins();
-        team->set_previous_wins(0);
+    catch (const std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
     }
-
-    // Add a player to the team:
-    team->add_player(playerStrength);
-
-    // Re-add the team to the teams rank tree (and re-add the wins)
-    teams_rank_tree.insert(team->get_pair_key(), team);
-    teams_rank_tree.add_wins_in_range(team->get_pair_key(), team->get_pair_key(), wins);
 	return StatusType::SUCCESS;
 }
 
@@ -110,21 +113,24 @@ StatusType olympics_t::remove_newest_player(int teamId)
         // Team doesn't exist or is empty
         return StatusType::FAILURE;
     }
+    try {
+        // Remove the team from the teams rank tree (and save the amount of wins the team has):
+        int wins = teams_rank_tree.get_num_wins(team->get_pair_key());
+        teams_rank_tree.erase(team->get_pair_key());
 
-    // Remove the team from the teams rank tree (and save the amount of wins the team has):
-    int wins = teams_rank_tree.get_num_wins(team->get_pair_key());
-    teams_rank_tree.erase(team->get_pair_key());
+        // Remove the player:
+        team->remove_newest_player();
 
-    // Remove the player:
-    team->remove_newest_player();
-
-    // If the team is not empty, re-add it to the teams rank tree (and re-add the wins)
-    if (team->getSize() > 0) {
-        teams_rank_tree.insert(team->get_pair_key(), team);
-        teams_rank_tree.add_wins_in_range(team->get_pair_key(), team->get_pair_key(), wins);
+        // If the team is not empty, re-add it to the teams rank tree (and re-add the wins)
+        if (team->getSize() > 0) {
+            teams_rank_tree.insert(team->get_pair_key(), team);
+            teams_rank_tree.add_wins_in_range(team->get_pair_key(), team->get_pair_key(), wins);
+        } else {
+            team->set_previous_wins(wins);
+        }
     }
-    else {
-        team->set_previous_wins(wins);
+    catch (const std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
     }
 	return StatusType::SUCCESS;
 }
@@ -213,35 +219,37 @@ StatusType olympics_t::unite_teams(int teamId1, int teamId2)
     if (!team1 || !team2) {
         return StatusType::FAILURE;
     }
+    try {
+        // Remove both teams from the teams rank tree (and save the amount of wins team1 has):
+        int wins = 0;
+        if (team1->getSize() > 0) {
+            // Remove the team from the teams rank tree (and save the amount of wins the team has):
+            wins = teams_rank_tree.get_num_wins(team1->get_pair_key());
+            teams_rank_tree.erase(team1->get_pair_key());
+        } else {
+            // If team is empty, use the previous number of wins from the team and reset previous_wins
+            wins = team1->get_previous_wins();
+            team1->set_previous_wins(0);
+        }
+        teams_rank_tree.erase(team2->get_pair_key());
 
-    // Remove both teams from the teams rank tree (and save the amount of wins team1 has):
-    int wins = 0;
-    if (team1->getSize() > 0) {
-        // Remove the team from the teams rank tree (and save the amount of wins the team has):
-        wins = teams_rank_tree.get_num_wins(team1->get_pair_key());
-        teams_rank_tree.erase(team1->get_pair_key());
-    }
-    else {
-        // If team is empty, use the previous number of wins from the team and reset previous_wins
-        wins = team1->get_previous_wins();
-        team1->set_previous_wins(0);
-    }
-    teams_rank_tree.erase(team2->get_pair_key());
+        // Unite the teams:
+        team1->unite_teams(*team2);
 
-    // Unite the teams:
-    team1->unite_teams(*team2);
+        // If team1 is not empty, re-add it to the teams rank tree (and re-add the wins)
+        if (team1->getSize() > 0) {
+            teams_rank_tree.insert(team1->get_pair_key(), team1);
+            teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), wins);
+        } else {
+            team1->set_previous_wins(wins);
+        }
 
-    // If team1 is not empty, re-add it to the teams rank tree (and re-add the wins)
-    if (team1->getSize() > 0) {
-        teams_rank_tree.insert(team1->get_pair_key(), team1);
-        teams_rank_tree.add_wins_in_range(team1->get_pair_key(), team1->get_pair_key(), wins);
+        // Remove team2 from olympics
+        remove_team(teamId2);
     }
-    else {
-        team1->set_previous_wins(wins);
+    catch (const std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
     }
-
-    // Remove team2 from olympics
-    remove_team(teamId2);
 
     return StatusType::SUCCESS;
 }
